@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@/components/colors';
 import { Plane } from 'lucide-react-native';
@@ -82,11 +82,7 @@ export default function Welcome() {
 
         <View style={styles.mascotContainer}>
           <Animated.View style={[styles.mascotCircle, bounceStyle]}>
-            <Image
-              source={require('@/assets/images/image.png')}
-              style={styles.mascotImage}
-              resizeMode="contain"
-            />
+            <Text style={styles.mascotEmoji}>✈️</Text>
           </Animated.View>
           <Animated.View style={[styles.sparkle1, sparkle1Style]}>
             <Text style={styles.sparkleText}>✨</Text>
@@ -162,9 +158,8 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: colors.accent + '60',
   },
-  mascotImage: {
-    width: 180,
-    height: 180,
+  mascotEmoji: {
+    fontSize: 100,
   },
   sparkle1: {
     position: 'absolute',
