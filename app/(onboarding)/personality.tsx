@@ -12,6 +12,9 @@ const TRAITS = [
   { name: 'Photographer', emoji: '📸' },
   { name: 'Concert Lover', emoji: '🎵' },
   { name: 'Sports Fan', emoji: '⚽' },
+  { name: 'Couch Potato', emoji: '🛋️' },
+  { name: 'Shopping Lover', emoji: '🛍️' },
+  { name: 'Party Guy', emoji: '🎉' },
 ];
 
 export default function Personality() {
@@ -176,8 +179,8 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: colors.pink,
     borderColor: colors.pink,
-    borderRadius: 20,
-    paddingVertical: 24,
+    borderRadius: 16,
+    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
@@ -193,11 +196,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent + '20',
   },
   localCultureEmoji: {
-    fontSize: 60,
-    marginBottom: 8,
+    fontSize: 44,
+    marginBottom: 4,
   },
   localCultureName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.text,
     textAlign: 'center',
