@@ -80,12 +80,11 @@ export default function Dashboard() {
         const completed = trips.filter(t => t.status === 'completed');
         const upcoming = trips.filter(t => t.status !== 'completed');
 
-        const totalDays = trips.reduce((sum, trip) => sum + (trip.staying_period || 0), 0);
         const completedDays = completed.reduce((sum, trip) => sum + (trip.staying_period || 0), 0);
-        const longestTrip = Math.max(...trips.map(t => t.staying_period || 0));
-        const avgTrip = trips.length > 0 ? Math.round(totalDays / trips.length) : 0;
+        const longestCompletedTrip = completed.length > 0 ? Math.max(...completed.map(t => t.staying_period || 0)) : 0;
+        const avgCompletedTrip = completed.length > 0 ? Math.round(completedDays / completed.length) : 0;
 
-        const uniqueDestinations = new Set(trips.map(t => t.destination.toLowerCase())).size;
+        const uniqueDestinations = new Set(completed.map(t => t.destination.toLowerCase())).size;
 
         const score = (completed.length * 100) + (completedDays * 25);
 
@@ -95,8 +94,8 @@ export default function Dashboard() {
           tripsCompleted: completed.length,
           upcomingTrips: upcoming.length,
           destinationsVisited: uniqueDestinations,
-          longestTrip,
-          avgTripLength: avgTrip,
+          longestTrip: longestCompletedTrip,
+          avgTripLength: avgCompletedTrip,
           travelScore: score,
         });
       }
