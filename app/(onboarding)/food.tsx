@@ -11,7 +11,6 @@ const FOODS = [
   { name: 'Pizza', emoji: '🍕' },
   { name: 'Pasta', emoji: '🍝' },
   { name: 'Steak', emoji: '🥩' },
-  { name: 'Kebab', emoji: '🥙' },
   { name: 'Ramen', emoji: '🍜' },
   { name: 'Sushi', emoji: '🍣' },
   { name: 'Salad', emoji: '🥗' },
@@ -70,20 +69,18 @@ export default function Food() {
                 <Text style={styles.foodName}>{food.name}</Text>
               </TouchableOpacity>
             ))}
+            <TouchableOpacity
+              style={[
+                styles.foodCard,
+                styles.localFoodCard,
+                isLocalFoodSelected && styles.localFoodCardSelected
+              ]}
+              onPress={() => toggle('Local Food')}
+            >
+              <Text style={styles.foodEmoji}>🌍</Text>
+              <Text style={styles.foodName}>Local Food</Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={[
-              styles.specialItem,
-              isLocalFoodSelected && styles.specialItemSelected
-            ]}
-            onPress={() => toggle('Local Food')}
-          >
-            <Globe size={32} color={isLocalFoodSelected ? colors.white : colors.accent} />
-            <Text style={[styles.specialText, isLocalFoodSelected && styles.specialTextSelected]}>
-              Local Food
-            </Text>
-          </TouchableOpacity>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
@@ -178,31 +175,13 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlign: 'center',
   },
-  specialItem: {
+  localFoodCard: {
     backgroundColor: colors.accentYellow,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    shadowColor: colors.accentYellow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    borderColor: colors.accentYellow,
   },
-  specialItemSelected: {
-    backgroundColor: colors.accent,
-  },
-  specialText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  specialTextSelected: {
-    color: colors.white,
+  localFoodCardSelected: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accent + '20',
   },
   buttonRow: {
     flexDirection: 'row',

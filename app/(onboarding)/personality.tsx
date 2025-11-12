@@ -66,20 +66,18 @@ export default function Personality() {
                 <Text style={styles.traitName}>{trait.name}</Text>
               </TouchableOpacity>
             ))}
+            <TouchableOpacity
+              style={[
+                styles.traitCard,
+                styles.localCultureCard,
+                isLocalCultureSelected && styles.localCultureCardSelected
+              ]}
+              onPress={() => toggle('Local Culture')}
+            >
+              <Text style={styles.traitEmoji}>❤️</Text>
+              <Text style={styles.traitName}>Local Culture</Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={[
-              styles.specialItem,
-              isLocalCultureSelected && styles.specialItemSelected
-            ]}
-            onPress={() => toggle('Local Culture')}
-          >
-            <Heart size={28} color={isLocalCultureSelected ? colors.white : colors.pink} fill={isLocalCultureSelected ? colors.white : colors.pink} />
-            <Text style={[styles.specialText, isLocalCultureSelected && styles.specialTextSelected]}>
-              Local Culture
-            </Text>
-          </TouchableOpacity>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
@@ -146,11 +144,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   traitCard: {
-    width: '47%',
+    width: '30%',
+    aspectRatio: 1,
     backgroundColor: colors.white,
     borderRadius: 16,
-    padding: 20,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 3,
     borderColor: colors.white,
     shadowColor: '#000',
@@ -165,39 +164,21 @@ const styles = StyleSheet.create({
   },
   traitEmoji: {
     fontSize: 40,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   traitName: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
   },
-  specialItem: {
+  localCultureCard: {
     backgroundColor: colors.pink,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    shadowColor: colors.pink,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    borderColor: colors.pink,
   },
-  specialItemSelected: {
-    backgroundColor: colors.accent,
-  },
-  specialText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  specialTextSelected: {
-    color: colors.white,
+  localCultureCardSelected: {
+    borderColor: colors.accent,
+    backgroundColor: colors.accent + '20',
   },
   buttonRow: {
     flexDirection: 'row',

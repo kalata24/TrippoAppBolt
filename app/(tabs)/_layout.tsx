@@ -10,50 +10,68 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: colors.white,
           borderTopWidth: 0,
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 60,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
+          paddingBottom: 6,
+          paddingTop: 6,
+          height: 65,
+          elevation: 0,
+          shadowOpacity: 0,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
-          marginTop: 4,
+          marginTop: 2,
         },
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textLight,
+        tabBarItemStyle: {
+          paddingVertical: 4,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Organize',
-          tabBarIcon: ({ color, size }) => <Plane size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Plane
+              size={22}
+              color={color}
+              fill={focused ? color : 'transparent'}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="dashboard"
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ color, size }) => <BarChart3 size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <BarChart3
+              size={22}
+              color={color}
+              fill={focused ? color : 'transparent'}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="my-trips"
         options={{
           title: 'My trips',
-          tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <Map
+              size={22}
+              color={color}
+              fill={focused ? color : 'transparent'}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="logout"
         options={{
           title: 'Log out',
-          tabBarIcon: ({ color, size }) => <LogOut size={size} color={color} />,
+          tabBarIcon: ({ color }) => <LogOut size={22} color={color} />,
         }}
       />
     </Tabs>
