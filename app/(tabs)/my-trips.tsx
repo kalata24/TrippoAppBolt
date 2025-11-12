@@ -189,16 +189,19 @@ export default function MyTrips() {
   const deleteTrip = async () => {
     if (!tripToDelete) return;
 
+    const tripId = tripToDelete.id;
+    setTripToDelete(null);
+
     try {
       const { error } = await supabase
         .from('trips')
         .delete()
-        .eq('id', tripToDelete.id);
+        .eq('id', tripId);
 
-      if (error) throw error;
-
-      setTrips(trips.filter(trip => trip.id !== tripToDelete.id));
-      setTripToDelete(null);
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
 
       await loadTrips();
     } catch (error) {
