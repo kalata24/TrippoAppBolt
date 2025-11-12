@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, TextInput, Animated } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { colors } from '@/components/colors';
@@ -46,10 +46,28 @@ export default function MyTrips() {
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const [packingLists, setPackingLists] = useState<Record<string, boolean>>({});
 
+  const headerScale = useRef(new Animated.Value(0.9)).current;
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+  const cardAnimations = useRef<{[key: string]: Animated.Value}>({}).current;
+
   useFocusEffect(
     useCallback(() => {
       if (user) {
         loadTrips();
+
+        Animated.parallel([
+          Animated.spring(headerScale, {
+            toValue: 1,
+            tension: 50,
+            friction: 7,
+            useNativeDriver: true,
+          }),
+          Animated.timing(headerOpacity, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+        ]).start();
       }
     }, [user])
   );
@@ -181,6 +199,8 @@ export default function MyTrips() {
 
       setTrips(trips.filter(trip => trip.id !== tripToDelete.id));
       setTripToDelete(null);
+
+      await loadTrips();
     } catch (error) {
       console.error('Error deleting trip:', error);
     }
@@ -223,8 +243,42 @@ export default function MyTrips() {
     });
   };
 
+  const getCardAnimation = (id: string) => {
+    if (!cardAnimations[id]) {
+      cardAnimations[id] = new Animated.Value(1);
+    }
+    return cardAnimations[id];
+  };
+
+  const handleCardPressIn = (id: string) => {
+    const anim = getCardAnimation(id);
+    Animated.spring(anim, {
+      toValue: 0.95,
+      tension: 300,
+      friction: 10,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleCardPressOut = (id: string) => {
+    const anim = getCardAnimation(id);
+    Animated.spring(anim, {
+      toValue: 1,
+      tension: 300,
+      friction: 10,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const renderTrip = ({ item }: { item: Trip }) => (
-    <View style={styles.tripCard}>
+    <Animated.View
+      style={[
+        styles.tripCard,
+        {
+          transform: [{ scale: getCardAnimation(item.id) }],
+        },
+      ]}
+    >
       <TouchableOpacity
         style={styles.favoriteButton}
         onPress={() => toggleFavorite(item.id, item.is_favorite)}
@@ -238,7 +292,10 @@ export default function MyTrips() {
 
       <TouchableOpacity
         onPress={() => router.push(`/trip/${item.id}`)}
+        onPressIn={() => handleCardPressIn(item.id)}
+        onPressOut={() => handleCardPressOut(item.id)}
         style={styles.tripContent}
+        activeOpacity={0.9}
       >
         <Text style={styles.tripTitle}>
           {item.title || `Trip to ${item.destination}`}
@@ -312,15 +369,23 @@ export default function MyTrips() {
           <Trash2 size={16} color={colors.error} />
         </TouchableOpacity>
       </View>
-    </View>
+    </Animated.View>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <Animated.View
+        style={[
+          styles.header,
+          {
+            opacity: headerOpacity,
+            transform: [{ scale: headerScale }],
+          },
+        ]}
+      >
         <View style={styles.headerTop}>
-          <Text style={styles.title}>My Trips</Text>
-          <Luggage size={28} color={colors.white} />
+          <Text style={styles.title}>My Trips ✈️</Text>
+          <Luggage size={32} color={colors.white} />
         </View>
 
         <View style={styles.searchContainer}>
@@ -380,7 +445,7 @@ export default function MyTrips() {
             })}
           </View>
         )}
-      </View>
+      </Animated.View>
 
       {loading ? (
         <View style={styles.centerContent}>
