@@ -55,10 +55,17 @@ Provide a JSON response with this structure:
     }
   ],
   "topAttractions": [
-    {"name": "Real attraction name in ${destination}", "day": "Day 1"}
+    {"name": "Real attraction name in ${destination}", "day": "Day 1"},
+    {"name": "Real attraction name in ${destination}", "day": "Day 2"},
+    {"name": "Real attraction name in ${destination}", "day": "Day 3"}
   ],
-  "personalizedMessage": "A personal message for ${name} about their trip to ${destination}"
-}`;
+  "personalizedMessage": "A short 2-sentence personal message for ${name} about their trip to ${destination}. Keep it warm, exciting, and concise."
+}
+
+IMPORTANT:
+- Always include EXACTLY 3 attractions in topAttractions array
+- Keep personalizedMessage to EXACTLY 2 sentences maximum
+- Make the message enthusiastic but brief`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {

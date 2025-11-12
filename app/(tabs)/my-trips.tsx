@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { colors } from '@/components/colors';
@@ -46,17 +46,20 @@ export default function MyTrips() {
   const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const [packingLists, setPackingLists] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    if (user) {
-      loadTrips();
-    }
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        loadTrips();
+      }
+    }, [user])
+  );
 
   useEffect(() => {
     filterTrips();
   }, [trips, searchQuery, selectedFilter]);
 
   const loadTrips = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('trips')
