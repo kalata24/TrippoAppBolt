@@ -226,7 +226,7 @@ export default function Dashboard() {
             <View style={styles.achievementsGrid}>
               <View style={[styles.achievementBadge, stats.destinationsVisited >= 5 ? styles.badgeUnlocked : styles.badgeLocked]}>
                 <MapPin size={28} color={stats.destinationsVisited >= 5 ? colors.blue : colors.textLight} />
-                <Text style={[styles.badgeTitle, !stats.destinationsVisited >= 5 && styles.badgeTitleLocked]}>
+                <Text style={[styles.badgeTitle, stats.destinationsVisited < 5 && styles.badgeTitleLocked]}>
                   World Explorer
                 </Text>
                 <Text style={styles.badgeProgress}>{stats.destinationsVisited}/5 destinations</Text>
@@ -235,7 +235,7 @@ export default function Dashboard() {
 
               <View style={[styles.achievementBadge, stats.longestTrip >= 7 ? styles.badgeUnlocked : styles.badgeLocked]}>
                 <Calendar size={28} color={stats.longestTrip >= 7 ? colors.accent : colors.textLight} />
-                <Text style={[styles.badgeTitle, !stats.longestTrip >= 7 && styles.badgeTitleLocked]}>
+                <Text style={[styles.badgeTitle, stats.longestTrip < 7 && styles.badgeTitleLocked]}>
                   Week Warrior
                 </Text>
                 <Text style={styles.badgeProgress}>{stats.longestTrip}/7 days</Text>
@@ -244,7 +244,7 @@ export default function Dashboard() {
 
               <View style={[styles.achievementBadge, stats.tripsCompleted >= 10 ? styles.badgeUnlocked : styles.badgeLocked]}>
                 <Plane size={28} color={stats.tripsCompleted >= 10 ? colors.primary : colors.textLight} />
-                <Text style={[styles.badgeTitle, !stats.tripsCompleted >= 10 && styles.badgeTitleLocked]}>
+                <Text style={[styles.badgeTitle, stats.tripsCompleted < 10 && styles.badgeTitleLocked]}>
                   Frequent Flyer
                 </Text>
                 <Text style={styles.badgeProgress}>{stats.tripsCompleted}/10 trips</Text>
@@ -253,7 +253,7 @@ export default function Dashboard() {
 
               <View style={[styles.achievementBadge, stats.totalDaysTraveled >= 30 ? styles.badgeUnlocked : styles.badgeLocked]}>
                 <Clock size={28} color={stats.totalDaysTraveled >= 30 ? colors.accentDark : colors.textLight} />
-                <Text style={[styles.badgeTitle, !stats.totalDaysTraveled >= 30 && styles.badgeTitleLocked]}>
+                <Text style={[styles.badgeTitle, stats.totalDaysTraveled < 30 && styles.badgeTitleLocked]}>
                   Month Nomad
                 </Text>
                 <Text style={styles.badgeProgress}>{stats.totalDaysTraveled}/30 days</Text>
@@ -335,14 +335,6 @@ const styles = StyleSheet.create({
   cardMint: {
     backgroundColor: '#E0F2F1',
     borderColor: colors.primaryLight,
-  },
-  cardOrange: {
-    backgroundColor: '#FFF3E0',
-    borderColor: '#FFE0B2',
-  },
-  cardPurple: {
-    backgroundColor: '#F3E5F5',
-    borderColor: '#E1BEE7',
   },
   statLabel: {
     fontSize: 14,
