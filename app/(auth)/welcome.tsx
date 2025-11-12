@@ -1,10 +1,78 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@/components/colors';
 import { Plane } from 'lucide-react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+  withSpring,
+} from 'react-native-reanimated';
+import { useEffect } from 'react';
 
 export default function Welcome() {
   const router = useRouter();
+  const bounceAnim = useSharedValue(0);
+  const sparkle1Anim = useSharedValue(0);
+  const sparkle2Anim = useSharedValue(0);
+  const rotateAnim = useSharedValue(0);
+
+  useEffect(() => {
+    bounceAnim.value = withRepeat(
+      withSequence(
+        withSpring(-15, { damping: 2, stiffness: 100 }),
+        withSpring(0, { damping: 2, stiffness: 100 })
+      ),
+      -1,
+      false
+    );
+
+    sparkle1Anim.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 800 }),
+        withTiming(0.5, { duration: 800 })
+      ),
+      -1,
+      true
+    );
+
+    sparkle2Anim.value = withRepeat(
+      withSequence(
+        withTiming(0.5, { duration: 1000 }),
+        withTiming(1, { duration: 1000 })
+      ),
+      -1,
+      true
+    );
+
+    rotateAnim.value = withRepeat(
+      withSequence(
+        withTiming(-5, { duration: 1000 }),
+        withTiming(5, { duration: 1000 })
+      ),
+      -1,
+      true
+    );
+  }, []);
+
+  const bounceStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: bounceAnim.value },
+      { rotate: `${rotateAnim.value}deg` },
+    ],
+  }));
+
+  const sparkle1Style = useAnimatedStyle(() => ({
+    opacity: sparkle1Anim.value,
+    transform: [{ scale: sparkle1Anim.value }],
+  }));
+
+  const sparkle2Style = useAnimatedStyle(() => ({
+    opacity: sparkle2Anim.value,
+    transform: [{ scale: sparkle2Anim.value }],
+  }));
 
   return (
     <View style={styles.container}>
@@ -13,15 +81,19 @@ export default function Welcome() {
         <Text style={styles.subtitle}>Your AI-powered travel planning companion</Text>
 
         <View style={styles.mascotContainer}>
-          <View style={styles.mascotCircle}>
-            <Text style={styles.mascotEmoji}>🦖</Text>
-          </View>
-          <View style={styles.sparkle1}>
+          <Animated.View style={[styles.mascotCircle, bounceStyle]}>
+            <Image
+              source={require('@/assets/images/image.png')}
+              style={styles.mascotImage}
+              resizeMode="contain"
+            />
+          </Animated.View>
+          <Animated.View style={[styles.sparkle1, sparkle1Style]}>
             <Text style={styles.sparkleText}>✨</Text>
-          </View>
-          <View style={styles.sparkle2}>
+          </Animated.View>
+          <Animated.View style={[styles.sparkle2, sparkle2Style]}>
             <Text style={styles.sparkleText}>✨</Text>
-          </View>
+          </Animated.View>
         </View>
 
         <Text style={styles.message}>Let's create your perfect trip in just a few steps!</Text>
@@ -81,17 +153,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   mascotCircle: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: colors.success + '20',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: colors.accentYellow + '30',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: colors.success + '40',
+    borderWidth: 4,
+    borderColor: colors.accent + '60',
   },
-  mascotEmoji: {
-    fontSize: 100,
+  mascotImage: {
+    width: 180,
+    height: 180,
   },
   sparkle1: {
     position: 'absolute',
