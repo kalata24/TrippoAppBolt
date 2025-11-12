@@ -10,24 +10,24 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: colors.white,
           borderTopWidth: 0,
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 70,
+          paddingBottom: 10,
+          paddingTop: 10,
+          height: 85,
           elevation: 0,
           shadowOpacity: 0,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
           marginTop: 4,
-          marginBottom: 2,
         },
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textLight,
         tabBarItemStyle: {
-          paddingVertical: 6,
-          gap: 4,
+          paddingVertical: 8,
         },
+        tabBarShowLabel: true,
+        tabBarLabelPosition: 'below-icon',
       }}
     >
       <Tabs.Screen
