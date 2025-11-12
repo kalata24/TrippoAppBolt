@@ -1,23 +1,23 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
-    "slug": "bolt-expo-nativewind",
+    "name": "Trippo",
+    "slug": "trippo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/trippo-icon.png",
+    "scheme": "trippo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.boltexpo.nativewind"
+      "bundleIdentifier": "com.trippo.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/trippo-icon.png",
+        "backgroundColor": "#7DD3C0"
       },
-      "package": "com.boltexpo.nativewind"
+      "package": "com.trippo.app"
     },
     "web": {
       "bundler": "metro",
