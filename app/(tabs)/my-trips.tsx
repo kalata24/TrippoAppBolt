@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { colors } from '@/components/colors';
-import { Search, MapPin, Calendar, Star, CheckCircle, Clock, ShoppingBag, Luggage, Trash2, Eye } from 'lucide-react-native';
+import { Search, MapPin, Calendar, Star, CircleCheck as CheckCircle, Clock, ShoppingBag, Luggage, Trash2, Eye } from 'lucide-react-native';
 import PackingListModal from '@/components/PackingListModal';
 import ConfirmModal from '@/components/ConfirmModal';
 
