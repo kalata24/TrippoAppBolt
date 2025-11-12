@@ -4,7 +4,7 @@
     "slug": "trippo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/trippo-icon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "trippo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,7 +14,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/trippo-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#7DD3C0"
       },
       "package": "com.trippo.app"
