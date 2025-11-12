@@ -178,29 +178,33 @@ export default function Dashboard() {
             </View>
 
             <View style={styles.achievementsGrid}>
-              <View style={styles.achievementItem}>
-                <MapPin size={28} color={colors.blue} />
-                <Text style={styles.achievementLabel}>Destinations Visited</Text>
-                <Text style={styles.achievementValue}>{stats.destinationsVisited}</Text>
+              <View style={styles.achievementRow}>
+                <View style={styles.achievementItem}>
+                  <MapPin size={32} color={colors.blue} />
+                  <Text style={styles.achievementLabel}>Destinations Visited</Text>
+                  <Text style={styles.achievementValue}>{stats.destinationsVisited}</Text>
+                </View>
+
+                <View style={styles.achievementItem}>
+                  <Calendar size={32} color={colors.accent} />
+                  <Text style={styles.achievementLabel}>Longest Trip</Text>
+                  <Text style={styles.achievementValue}>{stats.longestTrip} days</Text>
+                </View>
               </View>
 
-              <View style={styles.achievementItem}>
-                <Calendar size={28} color={colors.accent} />
-                <Text style={styles.achievementLabel}>Longest Trip</Text>
-                <Text style={styles.achievementValue}>{stats.longestTrip} days</Text>
-              </View>
+              <View style={styles.achievementRow}>
+                <View style={styles.achievementItem}>
+                  <Clock size={32} color={colors.primary} />
+                  <Text style={styles.achievementLabel}>Avg Trip Length</Text>
+                  <Text style={styles.achievementValue}>{stats.avgTripLength} days</Text>
+                </View>
 
-              <View style={styles.achievementItem}>
-                <Clock size={28} color={colors.primary} />
-                <Text style={styles.achievementLabel}>Avg Trip Length</Text>
-                <Text style={styles.achievementValue}>{stats.avgTripLength} days</Text>
-              </View>
-
-              <View style={styles.achievementItem}>
-                <Award size={28} color={colors.accentDark} />
-                <Text style={styles.achievementLabel}>Travel Score</Text>
-                <Text style={styles.achievementSubtext}>Complete trips & travel more days to increase</Text>
-                <Text style={styles.achievementValue}>{stats.travelScore}</Text>
+                <View style={styles.achievementItem}>
+                  <Award size={32} color={colors.accentDark} />
+                  <Text style={styles.achievementLabel}>Travel Score</Text>
+                  <Text style={styles.achievementSubtext}>Complete trips to increase</Text>
+                  <Text style={styles.achievementValue}>{stats.travelScore}</Text>
+                </View>
               </View>
             </View>
           </View>
@@ -315,24 +319,29 @@ const styles = StyleSheet.create({
     color: colors.textDark,
   },
   achievementsGrid: {
-    gap: 20,
+    gap: 16,
+  },
+  achievementRow: {
+    flexDirection: 'row',
+    gap: 16,
   },
   achievementItem: {
-    gap: 6,
+    flex: 1,
+    gap: 8,
   },
   achievementLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: colors.textMedium,
     marginTop: 4,
   },
   achievementValue: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 26,
+    fontWeight: '900',
     color: colors.textDark,
   },
   achievementSubtext: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '500',
     color: colors.textLight,
     fontStyle: 'italic',
