@@ -1,10 +1,14 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors } from '@/components/colors';
 import { ChevronDown } from 'lucide-react-native';
 import StepProgress from '@/components/StepProgress';
+
+let DateTimePicker: any = null;
+if (Platform.OS !== 'web') {
+  DateTimePicker = require('@react-native-community/datetimepicker').default;
+}
 
 const TOP_DESTINATIONS = [
   'Paris, France',
@@ -143,37 +147,116 @@ export default function Destination() {
           </View>
         </View>
 
-        {showStartPicker && (
-          <DateTimePicker
-            value={startDate || new Date()}
-            mode="date"
-            display="default"
-            minimumDate={new Date()}
-            onChange={(event, selectedDate) => {
-              setShowStartPicker(Platform.OS === 'ios');
-              if (selectedDate) {
-                setStartDate(selectedDate);
-                if (endDate && selectedDate > endDate) {
-                  setEndDate(undefined);
-                }
-              }
-            }}
-          />
-        )}
+        {Platform.OS === 'web' ? (
+          <>
+            {showStartPicker && (
+              <Modal
+                visible={showStartPicker}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowStartPicker(false)}
+              >
+                <View style={styles.modalOverlay}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Select Start Date</Text>
+                    <TextInput
+                      style={styles.dateInput}
+                      placeholder="YYYY-MM-DD"
+                      value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                      onChangeText={(text) => {
+                        if (text.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                          const date = new Date(text);
+                          if (!isNaN(date.getTime())) {
+                            setStartDate(date);
+                            if (endDate && date > endDate) {
+                              setEndDate(undefined);
+                            }
+                          }
+                        }
+                      }}
+                      {...(Platform.OS === 'web' && { type: 'date' } as any)}
+                    />
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => setShowStartPicker(false)}
+                    >
+                      <Text style={styles.modalButtonText}>Done</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+            )}
 
-        {showEndPicker && (
-          <DateTimePicker
-            value={endDate || startDate || new Date()}
-            mode="date"
-            display="default"
-            minimumDate={startDate || new Date()}
-            onChange={(event, selectedDate) => {
-              setShowEndPicker(Platform.OS === 'ios');
-              if (selectedDate) {
-                setEndDate(selectedDate);
-              }
-            }}
-          />
+            {showEndPicker && (
+              <Modal
+                visible={showEndPicker}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowEndPicker(false)}
+              >
+                <View style={styles.modalOverlay}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Select End Date</Text>
+                    <TextInput
+                      style={styles.dateInput}
+                      placeholder="YYYY-MM-DD"
+                      value={endDate ? endDate.toISOString().split('T')[0] : ''}
+                      onChangeText={(text) => {
+                        if (text.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                          const date = new Date(text);
+                          if (!isNaN(date.getTime())) {
+                            setEndDate(date);
+                          }
+                        }
+                      }}
+                      {...(Platform.OS === 'web' && { type: 'date' } as any)}
+                    />
+                    <TouchableOpacity
+                      style={styles.modalButton}
+                      onPress={() => setShowEndPicker(false)}
+                    >
+                      <Text style={styles.modalButtonText}>Done</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+            )}
+          </>
+        ) : (
+          <>
+            {showStartPicker && DateTimePicker && (
+              <DateTimePicker
+                value={startDate || new Date()}
+                mode="date"
+                display="default"
+                minimumDate={new Date()}
+                onChange={(event: any, selectedDate: any) => {
+                  setShowStartPicker(Platform.OS === 'ios');
+                  if (selectedDate) {
+                    setStartDate(selectedDate);
+                    if (endDate && selectedDate > endDate) {
+                      setEndDate(undefined);
+                    }
+                  }
+                }}
+              />
+            )}
+
+            {showEndPicker && DateTimePicker && (
+              <DateTimePicker
+                value={endDate || startDate || new Date()}
+                mode="date"
+                display="default"
+                minimumDate={startDate || new Date()}
+                onChange={(event: any, selectedDate: any) => {
+                  setShowEndPicker(Platform.OS === 'ios');
+                  if (selectedDate) {
+                    setEndDate(selectedDate);
+                  }
+                }}
+              />
+            )}
+          </>
         )}
 
         {startDate && endDate && (
@@ -359,5 +442,52 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    padding: 24,
+    width: '80%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.primary,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: colors.text,
+    backgroundColor: colors.white,
+    marginBottom: 16,
+  },
+  modalButton: {
+    backgroundColor: colors.accent,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
