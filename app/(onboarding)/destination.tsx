@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { colors } from '@/components/colors';
@@ -12,6 +12,7 @@ if (Platform.OS !== 'web') {
 }
 
 const TOP_DESTINATIONS = [
+  '✍️ Choose Manually',
   'Paris, France',
   'Tokyo, Japan',
   'New York, USA',
@@ -38,11 +39,15 @@ const TOP_DESTINATIONS = [
 export default function Destination() {
   const router = useRouter();
   const [destination, setDestination] = useState('');
+  const [manualDestination, setManualDestination] = useState('');
   const [showDestinations, setShowDestinations] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+
+  const isManualMode = destination === '✍️ Choose Manually';
+  const finalDestination = isManualMode ? manualDestination : destination;
 
   const calculateStayingPeriod = () => {
     if (!startDate || !endDate) return 0;
@@ -53,14 +58,14 @@ export default function Destination() {
   const stayingPeriod = calculateStayingPeriod();
 
   const handleContinue = () => {
-    if (!destination || !startDate || !endDate) return;
+    if (!finalDestination || !startDate || !endDate) return;
 
     if (stayingPeriod < 1 || stayingPeriod > 30) return;
 
     router.push({
       pathname: '/(onboarding)/food',
       params: {
-        destination,
+        destination: finalDestination,
         stayingPeriod: stayingPeriod.toString(),
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
@@ -68,7 +73,7 @@ export default function Destination() {
     });
   };
 
-  const isValid = destination && startDate && endDate && stayingPeriod >= 1 && stayingPeriod <= 30;
+  const isValid = finalDestination && startDate && endDate && stayingPeriod >= 1 && stayingPeriod <= 30;
 
   const formatDate = (date: Date | undefined) => {
     if (!date) return '';
@@ -119,6 +124,19 @@ export default function Destination() {
             </View>
           )}
         </View>
+
+        {isManualMode && (
+          <View style={styles.field}>
+            <Text style={styles.label}>Enter Your Destination</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="e.g., Kyoto, Japan or Machu Picchu, Peru"
+              value={manualDestination}
+              onChangeText={setManualDestination}
+              autoFocus
+            />
+          </View>
+        )}
 
         <View style={styles.row}>
           <View style={[styles.field, styles.halfField]}>
@@ -317,6 +335,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: colors.text,
+    backgroundColor: colors.white,
+  },
+  textInput: {
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 12,
