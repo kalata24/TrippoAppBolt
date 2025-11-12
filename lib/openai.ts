@@ -9,10 +9,12 @@ export async function generateTripPlan(
   age: number,
   currentLocation: string,
 ) {
-  const prompt = `Create a detailed ${stayingPeriod}-day trip itinerary for ${name}, age ${age}, traveling from ${currentLocation} to ${destination}.
+  const prompt = `Create a detailed ${stayingPeriod}-day trip itinerary for ${name}, age ${age}, visiting ${destination}.
 
 Personality: ${personalities.join(', ')}
 Favorite foods: ${foods.join(', ')}
+
+IMPORTANT: Create activities and recommendations ONLY for ${destination}. All ${stayingPeriod} days should be spent exploring ${destination} and its surroundings. Do NOT include any activities in ${currentLocation} or travel days.
 
 Provide a JSON response with this structure:
 {
