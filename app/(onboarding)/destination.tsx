@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors } from '@/components/colors';
 import { ChevronDown } from 'lucide-react-native';
 import StepProgress from '@/components/StepProgress';
@@ -28,36 +29,46 @@ const TOP_DESTINATIONS = [
   'Lisbon, Portugal',
 ];
 
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-
-const YEARS = ['2025', '2026', '2027'];
 
 export default function Destination() {
   const router = useRouter();
   const [destination, setDestination] = useState('');
   const [showDestinations, setShowDestinations] = useState(false);
-  const [stayingPeriod, setStayingPeriod] = useState('');
-  const [month, setMonth] = useState('');
-  const [showMonths, setShowMonths] = useState(false);
-  const [year, setYear] = useState('');
-  const [showYears, setShowYears] = useState(false);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+
+  const calculateStayingPeriod = () => {
+    if (!startDate || !endDate) return 0;
+    const diff = endDate.getTime() - startDate.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24)) + 1;
+  };
+
+  const stayingPeriod = calculateStayingPeriod();
 
   const handleContinue = () => {
-    if (!destination || !stayingPeriod || !month || !year) return;
+    if (!destination || !startDate || !endDate) return;
 
-    const period = parseInt(stayingPeriod);
-    if (period < 1 || period > 30) return;
+    if (stayingPeriod < 1 || stayingPeriod > 30) return;
 
     router.push({
       pathname: '/(onboarding)/food',
-      params: { destination, stayingPeriod, month, year },
+      params: {
+        destination,
+        stayingPeriod: stayingPeriod.toString(),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      },
     });
   };
 
-  const isValid = destination && stayingPeriod && parseInt(stayingPeriod) >= 1 && parseInt(stayingPeriod) <= 30 && month && year;
+  const isValid = destination && startDate && endDate && stayingPeriod >= 1 && stayingPeriod <= 30;
+
+  const formatDate = (date: Date | undefined) => {
+    if (!date) return '';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
 
   return (
     <View style={styles.container}>
@@ -104,81 +115,77 @@ export default function Destination() {
           )}
         </View>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Staying Period (days)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter number of days"
-            value={stayingPeriod}
-            onChangeText={setStayingPeriod}
-            keyboardType="number-pad"
-          />
-          <Text style={styles.hint}>Maximum 30 days</Text>
-        </View>
-
         <View style={styles.row}>
           <View style={[styles.field, styles.halfField]}>
-            <Text style={styles.label}>Month</Text>
+            <Text style={styles.label}>Start Date</Text>
             <TouchableOpacity
               style={styles.dropdown}
-              onPress={() => setShowMonths(!showMonths)}
+              onPress={() => setShowStartPicker(true)}
             >
-              <Text style={[styles.dropdownText, !month && styles.placeholder]}>
-                {month || 'Month'}
+              <Text style={[styles.dropdownText, !startDate && styles.placeholder]}>
+                {startDate ? formatDate(startDate) : 'Select start date'}
               </Text>
               <ChevronDown size={20} color={colors.textLight} />
             </TouchableOpacity>
-
-            {showMonths && (
-              <View style={styles.dropdownMenu}>
-                <ScrollView style={styles.dropdownScroll} nestedScrollEnabled>
-                  {MONTHS.map((m) => (
-                    <TouchableOpacity
-                      key={m}
-                      style={styles.dropdownItem}
-                      onPress={() => {
-                        setMonth(m);
-                        setShowMonths(false);
-                      }}
-                    >
-                      <Text style={styles.dropdownItemText}>{m}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
           </View>
 
           <View style={[styles.field, styles.halfField]}>
-            <Text style={styles.label}>Year</Text>
+            <Text style={styles.label}>End Date</Text>
             <TouchableOpacity
               style={styles.dropdown}
-              onPress={() => setShowYears(!showYears)}
+              onPress={() => setShowEndPicker(true)}
             >
-              <Text style={[styles.dropdownText, !year && styles.placeholder]}>
-                {year || 'Year'}
+              <Text style={[styles.dropdownText, !endDate && styles.placeholder]}>
+                {endDate ? formatDate(endDate) : 'Select end date'}
               </Text>
               <ChevronDown size={20} color={colors.textLight} />
             </TouchableOpacity>
-
-            {showYears && (
-              <View style={styles.dropdownMenu}>
-                {YEARS.map((y) => (
-                  <TouchableOpacity
-                    key={y}
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setYear(y);
-                      setShowYears(false);
-                    }}
-                  >
-                    <Text style={styles.dropdownItemText}>{y}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
           </View>
         </View>
+
+        {showStartPicker && (
+          <DateTimePicker
+            value={startDate || new Date()}
+            mode="date"
+            display="default"
+            minimumDate={new Date()}
+            onChange={(event, selectedDate) => {
+              setShowStartPicker(Platform.OS === 'ios');
+              if (selectedDate) {
+                setStartDate(selectedDate);
+                if (endDate && selectedDate > endDate) {
+                  setEndDate(undefined);
+                }
+              }
+            }}
+          />
+        )}
+
+        {showEndPicker && (
+          <DateTimePicker
+            value={endDate || startDate || new Date()}
+            mode="date"
+            display="default"
+            minimumDate={startDate || new Date()}
+            onChange={(event, selectedDate) => {
+              setShowEndPicker(Platform.OS === 'ios');
+              if (selectedDate) {
+                setEndDate(selectedDate);
+              }
+            }}
+          />
+        )}
+
+        {startDate && endDate && (
+          <View style={styles.periodInfo}>
+            <Text style={styles.periodText}>
+              {stayingPeriod} {stayingPeriod === 1 ? 'day' : 'days'}
+            </Text>
+            {stayingPeriod > 30 && (
+              <Text style={styles.errorText}>Maximum 30 days allowed</Text>
+            )}
+          </View>
+        )}
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
@@ -302,6 +309,24 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textLight,
     marginTop: 6,
+  },
+  periodInfo: {
+    marginTop: 12,
+    marginBottom: 12,
+    padding: 12,
+    backgroundColor: colors.accent + '20',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  periodText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.accent,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#ef4444',
+    marginTop: 4,
   },
   buttonRow: {
     flexDirection: 'row',

@@ -3,6 +3,8 @@ import { supabase } from './supabase';
 export async function generateTripPlan(
   destination: string,
   stayingPeriod: number,
+  startDate: string,
+  endDate: string,
   foods: string[],
   personalities: string[],
   name: string,
@@ -27,6 +29,8 @@ export async function generateTripPlan(
       body: JSON.stringify({
         destination,
         stayingPeriod,
+        startDate,
+        endDate,
         foods,
         personalities,
         name,

@@ -11,6 +11,8 @@ const OPENAI_API_KEY = 'sk-proj-u3HOwnNtef2WxpnnJi9Dmu5cYlnGlLtifblYt1u1wZSMXEqE
 interface TripRequest {
   destination: string;
   stayingPeriod: number;
+  startDate: string;
+  endDate: string;
   foods: string[];
   personalities: string[];
   name: string;
@@ -27,10 +29,17 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { destination, stayingPeriod, foods, personalities, name, age, currentLocation }: TripRequest = await req.json();
+    const { destination, stayingPeriod, startDate, endDate, foods, personalities, name, age, currentLocation }: TripRequest = await req.json();
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const travelMonth = start.toLocaleDateString('en-US', { month: 'long' });
+    const travelYear = start.getFullYear();
 
     const prompt = `Create a detailed ${stayingPeriod}-day trip itinerary for ${name}, age ${age}, visiting ${destination}.
 
+Travel Dates: ${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} to ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+Travel Period: ${travelMonth} ${travelYear}
 Personality: ${personalities.join(', ')}
 Favorite foods: ${foods.join(', ')}
 
@@ -46,15 +55,26 @@ CRITICAL REQUIREMENTS:
    - If "Foodie": Include famous restaurants, food markets, local cuisine spots
    - If "Art Lover": Include museums, galleries, street art areas
    - If "Photographer": Include scenic viewpoints, photo spots
-   - If "Concert Lover": Include music venues, concert halls
-   - If "Sports Fan": Include stadiums, sports bars, local team experiences
-   - If "Local Culture": Include traditional markets, cultural centers, local neighborhoods
-4. For restaurants, match the food types selected:
+   - If "Concert Lover": Check for concerts, music festivals, live performances happening during ${travelMonth} ${travelYear} in ${destination}
+   - If "Sports Fan": Check for sports events, matches, tournaments happening during ${travelMonth} ${travelYear} in ${destination}
+   - If "Local Culture": Include traditional markets, cultural centers, local neighborhoods, and check for local festivals, events during ${travelMonth} ${travelYear}
+4. IMPORTANT EVENT MATCHING:
+   - Based on the travel period (${travelMonth} ${travelYear}), include ANY major events happening in ${destination}:
+     * Music concerts and festivals
+     * Sports events (football, basketball, tennis tournaments, Olympics, etc.)
+     * Cultural festivals and celebrations
+     * Winter markets (if traveling November-January)
+     * Food festivals
+     * Art exhibitions and gallery openings
+     * Holiday celebrations and parades
+   - If such events exist during the travel period, incorporate them into the itinerary
+   - Mention specific event names if known (e.g., "Oktoberfest", "Champions League Match", "Christmas Market at Marienplatz")
+5. For restaurants, match the food types selected:
    - Use real restaurant names that serve that cuisine type in ${destination}
    - Example: If "Pizza" selected and destination is London, include "Franco Manca" or "Pizza Pilgrims"
-5. Format activities like: "Visit [Specific Place Name] - [brief description] - [duration in minutes]"
-6. Make durations realistic (7-12 hours per day)
-7. Calculate realistic walking distances and steps
+6. Format activities like: "Visit [Specific Place Name] - [brief description] - [duration in minutes]"
+7. Make durations realistic (7-12 hours per day)
+8. Calculate realistic walking distances and steps
 
 Example format for activities:
 - "Buckingham Palace (Changing of the Guard) - 60 minutes"
