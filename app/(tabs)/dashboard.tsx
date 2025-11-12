@@ -174,6 +174,12 @@ export default function Dashboard() {
             <Text style={styles.statValue}>{stats.upcomingTrips}</Text>
           </View>
 
+          <View style={[styles.statCard, styles.cardOrange]}>
+            <MapPin size={32} color={colors.accentDark} />
+            <Text style={styles.statLabel}>Destinations Visited</Text>
+            <Text style={styles.statValue}>{stats.destinationsVisited}</Text>
+          </View>
+
           <View style={styles.scoreCard}>
             <View style={styles.scoreHeader}>
               <View style={styles.scoreIcon}>
@@ -330,6 +336,10 @@ const styles = StyleSheet.create({
   cardMint: {
     backgroundColor: '#E0F2F1',
     borderColor: colors.primaryLight,
+  },
+  cardOrange: {
+    backgroundColor: '#FFF3E0',
+    borderColor: '#FFE0B2',
   },
   cardPurple: {
     backgroundColor: '#F3E5F5',
