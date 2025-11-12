@@ -43,7 +43,11 @@ export default function Processing() {
           name: params.name as string,
           age: parseInt(params.age as string),
           current_location: params.location as string,
+          travel_month: params.month as string,
+          travel_year: params.year ? parseInt(params.year as string) : new Date().getFullYear(),
           itinerary: itinerary,
+          is_saved: false,
+          status: 'upcoming',
         })
         .select()
         .single();
