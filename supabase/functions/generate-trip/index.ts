@@ -58,17 +58,19 @@ CRITICAL REQUIREMENTS:
    - If "Concert Lover": Check for concerts, music festivals, live performances happening during ${travelMonth} ${travelYear} in ${destination}
    - If "Sports Fan": Check for sports events, matches, tournaments happening during ${travelMonth} ${travelYear} in ${destination}
    - If "Local Culture": Include traditional markets, cultural centers, local neighborhoods, and check for local festivals, events during ${travelMonth} ${travelYear}
-4. IMPORTANT EVENT MATCHING:
-   - Based on the travel period (${travelMonth} ${travelYear}), include ANY major events happening in ${destination}:
-     * Music concerts and festivals
-     * Sports events (football, basketball, tennis tournaments, Olympics, etc.)
-     * Cultural festivals and celebrations
-     * Winter markets (if traveling November-January)
-     * Food festivals
-     * Art exhibitions and gallery openings
-     * Holiday celebrations and parades
-   - If such events exist during the travel period, incorporate them into the itinerary
-   - Mention specific event names if known (e.g., "Oktoberfest", "Champions League Match", "Christmas Market at Marienplatz")
+4. IMPORTANT - REAL EVENTS ON SPECIFIC DATES:
+   - MANDATORY: Research and include REAL events happening on the EXACT dates of travel (${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} to ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })})
+   - Look for specific concerts, sports matches, festivals, and events scheduled for these dates in ${destination}
+   - Examples of what to include if they match the dates:
+     * "The Weeknd Concert at Wembley Stadium (${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })})"
+     * "Manchester United vs Liverpool at Old Trafford (Premier League match on specific date)"
+     * "Taylor Swift Eras Tour at [Venue Name]"
+     * "US Open Tennis Quarter Finals"
+     * "Oktoberfest beer festival" (if dates align)
+     * "Christmas Market at specific location" (November-December)
+   - Include venue names, event names, and approximate times when suggesting real events
+   - If you know of recurring events (e.g., "Broadway shows", "Premier League matches"), mention them generically if no specific match is known
+   - PRIORITY: Give concrete, real event suggestions over generic activity suggestions when possible
 5. For restaurants, match the food types selected:
    - Use real restaurant names that serve that cuisine type in ${destination}
    - Example: If "Pizza" selected and destination is London, include "Franco Manca" or "Pizza Pilgrims"

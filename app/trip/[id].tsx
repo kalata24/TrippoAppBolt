@@ -34,6 +34,8 @@ interface TripData {
   age: number;
   title?: string;
   is_saved: boolean;
+  start_date?: string;
+  end_date?: string;
   itinerary: {
     days: DayItinerary[];
     topAttractions: Array<{ name: string; day: string }>;
@@ -56,6 +58,16 @@ export default function TripDetail() {
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scrollViewRef = useRef<ScrollView>(null);
+
+  const formatDayDate = (dayNumber: number): string => {
+    if (!trip?.start_date) return '';
+
+    const startDate = new Date(trip.start_date);
+    const dayDate = new Date(startDate);
+    dayDate.setDate(startDate.getDate() + dayNumber - 1);
+
+    return dayDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
+  };
 
   useEffect(() => {
     loadTrip();
@@ -310,7 +322,12 @@ export default function TripDetail() {
               activeOpacity={0.7}
             >
               <View style={styles.dayHeaderLeft}>
-                <Text style={styles.dayTitle}>Day {day.day}</Text>
+                <Text style={styles.dayTitle}>
+                  Day {day.day}
+                  {trip.start_date && (
+                    <Text style={styles.dayDate}> - {formatDayDate(day.day)}</Text>
+                  )}
+                </Text>
                 <Text style={styles.daySubtitlePreview}>{day.title}</Text>
               </View>
               {expandedDays.includes(day.day) ? (
@@ -578,6 +595,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.primary,
     marginBottom: 6,
+  },
+  dayDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textMedium,
   },
   daySubtitlePreview: {
     fontSize: 14,
