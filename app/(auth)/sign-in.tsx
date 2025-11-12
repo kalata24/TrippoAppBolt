@@ -13,17 +13,25 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   const handleSignIn = async () => {
+    setError('');
+
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
     }
 
+    console.log('Sign in button pressed with email:', email);
     setLoading(true);
     const { error: signInError } = await signIn(email, password);
     setLoading(false);
 
+    console.log('Sign in result:', signInError);
+
     if (signInError) {
       setError(signInError);
+      console.error('Setting error state:', signInError);
+    } else {
+      console.log('Sign in successful, should redirect');
     }
   };
 
