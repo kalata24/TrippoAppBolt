@@ -58,19 +58,19 @@ CRITICAL REQUIREMENTS:
    - If "Concert Lover": Check for concerts, music festivals, live performances happening during ${travelMonth} ${travelYear} in ${destination}
    - If "Sports Fan": Check for sports events, matches, tournaments happening during ${travelMonth} ${travelYear} in ${destination}
    - If "Local Culture": Include traditional markets, cultural centers, local neighborhoods, and check for local festivals, events during ${travelMonth} ${travelYear}
-4. IMPORTANT - REAL EVENTS ON SPECIFIC DATES:
-   - MANDATORY: Research and include REAL events happening on the EXACT dates of travel (${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} to ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })})
-   - Look for specific concerts, sports matches, festivals, and events scheduled for these dates in ${destination}
-   - Examples of what to include if they match the dates:
-     * "The Weeknd Concert at Wembley Stadium (${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })})"
-     * "Manchester United vs Liverpool at Old Trafford (Premier League match on specific date)"
-     * "Taylor Swift Eras Tour at [Venue Name]"
-     * "US Open Tennis Quarter Finals"
-     * "Oktoberfest beer festival" (if dates align)
-     * "Christmas Market at specific location" (November-December)
-   - Include venue names, event names, and approximate times when suggesting real events
-   - If you know of recurring events (e.g., "Broadway shows", "Premier League matches"), mention them generically if no specific match is known
-   - PRIORITY: Give concrete, real event suggestions over generic activity suggestions when possible
+4. EVENTS AND ENTERTAINMENT:
+   - ONLY suggest specific events (concerts, sports matches) if you are CERTAIN they are happening on those exact dates
+   - If you don't have confirmed information about specific events on ${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} to ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}, suggest GENERAL activities instead:
+     * Instead of "Liverpool vs Everton match": suggest "Check for Premier League matches at Anfield Stadium (verify schedule)"
+     * Instead of specific concert: suggest "Explore live music venues like [Venue Name]"
+     * Instead of specific festival: suggest "Visit [venue] to see if there are any events during your stay"
+   - For seasonal/recurring events you CAN mention if dates align:
+     * Broadway shows (always running)
+     * Christmas Markets (November-December)
+     * Oktoberfest (mid-September to early October)
+     * Major annual festivals if dates match
+   - NEVER invent specific event matchups or concert dates
+   - Use phrases like "Check for", "Look for", "Explore" when suggesting event venues without confirmed schedules
 5. For restaurants, match the food types selected:
    - Use real restaurant names that serve that cuisine type in ${destination}
    - Example: If "Pizza" selected and destination is London, include "Franco Manca" or "Pizza Pilgrims"
