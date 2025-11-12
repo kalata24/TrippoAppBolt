@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Animated } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/components/colors';
-import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, ChevronRight, Bookmark, BookmarkCheck } from 'lucide-react-native';
+import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, ChevronRight, Bookmark, BookmarkCheck, Sparkles } from 'lucide-react-native';
 import { useAuth } from '@/lib/auth-context';
 import Notification from '@/components/Notification';
 import SaveTripModal from '@/components/SaveTripModal';
@@ -51,10 +52,36 @@ export default function TripDetail() {
   const [showNotification, setShowNotification] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
     loadTrip();
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && trip) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          tension: 40,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [loading, trip]);
 
   const loadTrip = async () => {
     try {
@@ -139,15 +166,38 @@ export default function TripDetail() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <LinearGradient
+        colors={[colors.primary, colors.primaryLight, colors.success]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <ArrowLeft size={24} color={colors.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{trip.destination}</Text>
-      </View>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>{trip.destination}</Text>
+          <View style={styles.headerBadge}>
+            <Sparkles size={14} color={colors.accentYellow} />
+            <Text style={styles.headerBadgeText}>{trip.staying_period} Days</Text>
+          </View>
+        </View>
+      </LinearGradient>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {trip.itinerary.days.map((day) => (
+        <Animated.View
+          style={[
+            styles.animatedContainer,
+            {
+              opacity: fadeAnim,
+              transform: [
+                { scale: scaleAnim },
+                { translateY: slideAnim },
+              ],
+            },
+          ]}
+        >
+        {trip.itinerary.days.map((day, dayIndex) => (
           <View key={day.day} style={styles.dayCard}>
             <TouchableOpacity
               style={styles.dayHeader}
@@ -257,6 +307,7 @@ export default function TripDetail() {
         )}
 
         <View style={{ height: 100 }} />
+        </Animated.View>
       </ScrollView>
 
       <SaveTripModal
@@ -319,86 +370,121 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: colors.success,
+    paddingBottom: 24,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   backButton: {
-    marginRight: 12,
+    marginRight: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    padding: 10,
+    borderRadius: 12,
+  },
+  headerContent: {
+    flex: 1,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '800',
     color: colors.white,
+    marginBottom: 6,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  headerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    gap: 6,
+  },
+  headerBadgeText: {
+    color: colors.white,
+    fontSize: 13,
+    fontWeight: '700',
   },
   scrollView: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
   },
+  animatedContainer: {
+    flex: 1,
+  },
   dayCard: {
-    backgroundColor: colors.cardBg,
-    borderRadius: 16,
-    marginBottom: 16,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    marginBottom: 18,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   dayHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    paddingVertical: 18,
+    backgroundColor: colors.cream,
   },
   dayHeaderLeft: {
     flex: 1,
   },
   dayTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textDark,
-    marginBottom: 4,
+    fontSize: 19,
+    fontWeight: '800',
+    color: colors.primary,
+    marginBottom: 6,
   },
   daySubtitlePreview: {
-    fontSize: 13,
-    color: colors.textLight,
-    fontWeight: '500',
+    fontSize: 14,
+    color: colors.textMedium,
+    fontWeight: '600',
   },
   dayContent: {
-    padding: 16,
+    padding: 20,
+    backgroundColor: colors.surfaceLight,
   },
   activity: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 14,
     backgroundColor: colors.white,
-    padding: 14,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 16,
     borderLeftWidth: 4,
     borderLeftColor: colors.accent,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowColor: colors.cardShadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   activityIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.surfaceLight,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.cream,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 14,
+    borderWidth: 2,
+    borderColor: colors.accentLight,
   },
   activityEmoji: {
-    fontSize: 16,
+    fontSize: 20,
   },
   activityText: {
     flex: 1,
@@ -433,33 +519,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.success,
-    paddingVertical: 14,
-    borderRadius: 12,
-    shadowColor: colors.success,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    gap: 10,
+    backgroundColor: colors.primary,
+    paddingVertical: 16,
+    borderRadius: 16,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 5,
   },
   directionsText: {
     color: colors.white,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
+    letterSpacing: 0.5,
   },
   attractionsCard: {
-    backgroundColor: colors.cardBg,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 18,
     borderWidth: 3,
-    borderColor: colors.borderOrange,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderColor: colors.accentLight,
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
   },
   attractionsHeader: {
     flexDirection: 'row',
@@ -471,114 +558,130 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   attractionsTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     color: colors.primary,
   },
   attractionsSubtitle: {
-    fontSize: 12,
-    color: colors.textLight,
-    marginBottom: 16,
+    fontSize: 13,
+    color: colors.textMedium,
+    marginBottom: 20,
+    fontWeight: '500',
   },
   attractionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    backgroundColor: colors.cream,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: colors.borderLight,
   },
   attractionNumber: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   attractionNumberText: {
     color: colors.white,
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
   },
   attractionContent: {
     flex: 1,
   },
   attractionName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  attractionDay: {
-    fontSize: 12,
-    color: colors.accent,
-    fontWeight: '500',
-  },
-  messageCard: {
-    backgroundColor: colors.cardBg,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 3,
-    borderColor: colors.borderOrange,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  messageTitle: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.textDark,
-    marginBottom: 12,
+    marginBottom: 4,
+  },
+  attractionDay: {
+    fontSize: 13,
+    color: colors.accent,
+    fontWeight: '600',
+  },
+  messageCard: {
+    backgroundColor: colors.peach,
+    borderRadius: 24,
+    padding: 28,
+    marginBottom: 18,
+    borderWidth: 0,
+    alignItems: 'center',
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  messageTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: colors.primary,
+    marginBottom: 16,
     textAlign: 'center',
   },
   messageText: {
-    fontSize: 14,
-    color: colors.text,
-    lineHeight: 22,
+    fontSize: 16,
+    color: colors.textDark,
+    lineHeight: 26,
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    fontWeight: '500',
   },
   messageEmoji: {
-    fontSize: 24,
+    fontSize: 32,
   },
   saveButton: {
     backgroundColor: colors.accent,
-    paddingVertical: 16,
-    borderRadius: 16,
+    paddingVertical: 18,
+    borderRadius: 20,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     shadowColor: colors.accent,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: colors.accentLight,
   },
   saveButtonText: {
     color: colors.white,
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   savedButton: {
-    backgroundColor: colors.surfaceLight,
-    paddingVertical: 16,
-    borderRadius: 16,
+    backgroundColor: colors.successLight,
+    paddingVertical: 18,
+    borderRadius: 20,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     borderWidth: 2,
-    borderColor: colors.border,
+    borderColor: colors.success,
+    shadowColor: colors.success,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   savedButtonText: {
-    color: colors.textDark,
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.primary,
+    fontSize: 17,
+    fontWeight: '800',
   },
 });
