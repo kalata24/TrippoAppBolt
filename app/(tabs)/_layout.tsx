@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
-import { Plane, BarChart3, Map, LogOut } from 'lucide-react-native';
+import { Plane, TrendingUp, Map, LogOut } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '@/components/colors';
 
@@ -11,16 +11,15 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.white,
-          borderTopWidth: 3,
-          borderTopColor: colors.cream,
+          borderTopWidth: 0,
           paddingBottom: 20,
           paddingTop: 16,
           height: 95,
           elevation: 12,
           shadowColor: colors.primary,
           shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
+          shadowOpacity: 0.2,
+          shadowRadius: 16,
         },
         tabBarLabelStyle: {
           fontSize: 11,
@@ -45,15 +44,16 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View
               style={{
-                backgroundColor: focused ? colors.cream : 'transparent',
-                padding: 8,
-                borderRadius: 12,
+                backgroundColor: focused ? colors.accent + '20' : 'transparent',
+                padding: 10,
+                borderRadius: 16,
+                transform: [{ scale: focused ? 1.1 : 1 }],
               }}
             >
               <Plane
                 size={26}
                 color={focused ? colors.accent : color}
-                fill={focused ? colors.accent : 'transparent'}
+                strokeWidth={focused ? 2.5 : 2}
               />
             </View>
           ),
@@ -66,15 +66,16 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View
               style={{
-                backgroundColor: focused ? colors.cream : 'transparent',
-                padding: 8,
-                borderRadius: 12,
+                backgroundColor: focused ? colors.blue + '20' : 'transparent',
+                padding: 10,
+                borderRadius: 16,
+                transform: [{ scale: focused ? 1.1 : 1 }],
               }}
             >
-              <BarChart3
+              <TrendingUp
                 size={26}
-                color={focused ? colors.success : color}
-                fill={focused ? colors.success : 'transparent'}
+                color={focused ? colors.blue : color}
+                strokeWidth={focused ? 2.5 : 2}
               />
             </View>
           ),
@@ -87,15 +88,16 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View
               style={{
-                backgroundColor: focused ? colors.cream : 'transparent',
-                padding: 8,
-                borderRadius: 12,
+                backgroundColor: focused ? colors.success + '20' : 'transparent',
+                padding: 10,
+                borderRadius: 16,
+                transform: [{ scale: focused ? 1.1 : 1 }],
               }}
             >
               <Map
                 size={26}
-                color={focused ? colors.primary : color}
-                fill={focused ? colors.primary : 'transparent'}
+                color={focused ? colors.success : color}
+                strokeWidth={focused ? 2.5 : 2}
               />
             </View>
           ),
@@ -108,12 +110,17 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, focused }) => (
             <View
               style={{
-                backgroundColor: focused ? colors.errorLight : 'transparent',
-                padding: 8,
-                borderRadius: 12,
+                backgroundColor: focused ? colors.error + '20' : 'transparent',
+                padding: 10,
+                borderRadius: 16,
+                transform: [{ scale: focused ? 1.1 : 1 }],
               }}
             >
-              <LogOut size={26} color={focused ? colors.error : color} />
+              <LogOut
+                size={26}
+                color={focused ? colors.error : color}
+                strokeWidth={focused ? 2.5 : 2}
+              />
             </View>
           ),
         }}
