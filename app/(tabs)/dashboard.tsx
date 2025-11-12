@@ -174,40 +174,85 @@ export default function Dashboard() {
             <Text style={styles.statValue}>{stats.upcomingTrips}</Text>
           </View>
 
-          <View style={[styles.achievementsCard, styles.cardPurple]}>
+          <View style={styles.scoreCard}>
+            <View style={styles.scoreHeader}>
+              <View style={styles.scoreIcon}>
+                <Award size={40} color="#FFD700" />
+              </View>
+              <View style={styles.scoreInfo}>
+                <Text style={styles.scoreLabel}>TRAVEL SCORE</Text>
+                <Text style={styles.scoreValue}>{stats.travelScore.toLocaleString()}</Text>
+                <Text style={styles.scoreLevelText}>Level {Math.floor(stats.travelScore / 500) + 1} Explorer</Text>
+              </View>
+            </View>
+
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBarBg}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: `${((stats.travelScore % 500) / 500) * 100}%` }
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {stats.travelScore % 500} / 500 to Level {Math.floor(stats.travelScore / 500) + 2}
+              </Text>
+            </View>
+
+            <View style={styles.scoreBreakdown}>
+              <View style={styles.breakdownItem}>
+                <CheckCircle size={16} color={colors.success} />
+                <Text style={styles.breakdownText}>{stats.tripsCompleted} trips × 100 pts</Text>
+              </View>
+              <View style={styles.breakdownItem}>
+                <Calendar size={16} color={colors.blue} />
+                <Text style={styles.breakdownText}>{stats.totalDaysTraveled} days × 25 pts</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.achievementsCard}>
             <View style={styles.achievementsHeader}>
-              <Award size={24} color={colors.accent} />
-              <Text style={styles.achievementsTitle}>Travel Achievements</Text>
+              <Text style={styles.achievementsTitle}>Achievements</Text>
+              <Text style={styles.achievementsSubtitle}>Keep traveling to unlock more!</Text>
             </View>
 
             <View style={styles.achievementsGrid}>
-              <View style={styles.achievementRow}>
-                <View style={styles.achievementItem}>
-                  <MapPin size={32} color={colors.blue} />
-                  <Text style={styles.achievementLabel}>Destinations Visited</Text>
-                  <Text style={styles.achievementValue}>{stats.destinationsVisited}</Text>
-                </View>
-
-                <View style={styles.achievementItem}>
-                  <Calendar size={32} color={colors.accent} />
-                  <Text style={styles.achievementLabel}>Longest Trip</Text>
-                  <Text style={styles.achievementValue}>{stats.longestTrip} days</Text>
-                </View>
+              <View style={[styles.achievementBadge, stats.destinationsVisited >= 5 ? styles.badgeUnlocked : styles.badgeLocked]}>
+                <MapPin size={28} color={stats.destinationsVisited >= 5 ? colors.blue : colors.textLight} />
+                <Text style={[styles.badgeTitle, !stats.destinationsVisited >= 5 && styles.badgeTitleLocked]}>
+                  World Explorer
+                </Text>
+                <Text style={styles.badgeProgress}>{stats.destinationsVisited}/5 destinations</Text>
+                {stats.destinationsVisited >= 5 && <Text style={styles.badgeUnlockedText}>UNLOCKED</Text>}
               </View>
 
-              <View style={styles.achievementRow}>
-                <View style={styles.achievementItem}>
-                  <Clock size={32} color={colors.primary} />
-                  <Text style={styles.achievementLabel}>Avg Trip Length</Text>
-                  <Text style={styles.achievementValue}>{stats.avgTripLength} days</Text>
-                </View>
+              <View style={[styles.achievementBadge, stats.longestTrip >= 7 ? styles.badgeUnlocked : styles.badgeLocked]}>
+                <Calendar size={28} color={stats.longestTrip >= 7 ? colors.accent : colors.textLight} />
+                <Text style={[styles.badgeTitle, !stats.longestTrip >= 7 && styles.badgeTitleLocked]}>
+                  Week Warrior
+                </Text>
+                <Text style={styles.badgeProgress}>{stats.longestTrip}/7 days</Text>
+                {stats.longestTrip >= 7 && <Text style={styles.badgeUnlockedText}>UNLOCKED</Text>}
+              </View>
 
-                <View style={styles.achievementItem}>
-                  <Award size={32} color={colors.accentDark} />
-                  <Text style={styles.achievementLabel}>Travel Score</Text>
-                  <Text style={styles.achievementSubtext}>Complete trips to increase</Text>
-                  <Text style={styles.achievementValue}>{stats.travelScore}</Text>
-                </View>
+              <View style={[styles.achievementBadge, stats.tripsCompleted >= 10 ? styles.badgeUnlocked : styles.badgeLocked]}>
+                <Plane size={28} color={stats.tripsCompleted >= 10 ? colors.primary : colors.textLight} />
+                <Text style={[styles.badgeTitle, !stats.tripsCompleted >= 10 && styles.badgeTitleLocked]}>
+                  Frequent Flyer
+                </Text>
+                <Text style={styles.badgeProgress}>{stats.tripsCompleted}/10 trips</Text>
+                {stats.tripsCompleted >= 10 && <Text style={styles.badgeUnlockedText}>UNLOCKED</Text>}
+              </View>
+
+              <View style={[styles.achievementBadge, stats.totalDaysTraveled >= 30 ? styles.badgeUnlocked : styles.badgeLocked]}>
+                <Clock size={28} color={stats.totalDaysTraveled >= 30 ? colors.accentDark : colors.textLight} />
+                <Text style={[styles.badgeTitle, !stats.totalDaysTraveled >= 30 && styles.badgeTitleLocked]}>
+                  Month Nomad
+                </Text>
+                <Text style={styles.badgeProgress}>{stats.totalDaysTraveled}/30 days</Text>
+                {stats.totalDaysTraveled >= 30 && <Text style={styles.badgeUnlockedText}>UNLOCKED</Text>}
               </View>
             </View>
           </View>
@@ -300,10 +345,92 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: colors.textDark,
   },
+  scoreCard: {
+    padding: 24,
+    borderRadius: 20,
+    backgroundColor: '#1A1A2E',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+    gap: 20,
+    marginTop: 8,
+  },
+  scoreHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  scoreIcon: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#FFD700',
+  },
+  scoreInfo: {
+    flex: 1,
+    gap: 4,
+  },
+  scoreLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFD700',
+    letterSpacing: 1.5,
+  },
+  scoreValue: {
+    fontSize: 36,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  scoreLevelText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFD700',
+  },
+  progressBarContainer: {
+    gap: 8,
+  },
+  progressBarBg: {
+    height: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#FFD700',
+    borderRadius: 6,
+  },
+  progressText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  scoreBreakdown: {
+    flexDirection: 'row',
+    gap: 16,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  breakdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  breakdownText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.8)',
+  },
   achievementsCard: {
     padding: 20,
     borderRadius: 16,
-    borderWidth: 2,
+    backgroundColor: colors.white,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -312,41 +439,60 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   achievementsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
+    gap: 4,
   },
   achievementsTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: colors.textDark,
-  },
-  achievementsGrid: {
-    gap: 16,
-  },
-  achievementRow: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  achievementItem: {
-    flex: 1,
-    gap: 8,
-  },
-  achievementLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.textMedium,
-    marginTop: 4,
-  },
-  achievementValue: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: '900',
     color: colors.textDark,
   },
-  achievementSubtext: {
-    fontSize: 10,
-    fontWeight: '500',
+  achievementsSubtitle: {
+    fontSize: 13,
+    fontWeight: '600',
     color: colors.textLight,
-    fontStyle: 'italic',
+  },
+  achievementsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  achievementBadge: {
+    width: '48%',
+    padding: 16,
+    borderRadius: 14,
+    gap: 8,
+    alignItems: 'center',
+    borderWidth: 2,
+  },
+  badgeUnlocked: {
+    backgroundColor: '#F0FFF4',
+    borderColor: colors.success,
+  },
+  badgeLocked: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#E0E0E0',
+    opacity: 0.6,
+  },
+  badgeTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.textDark,
+    textAlign: 'center',
+  },
+  badgeTitleLocked: {
+    color: colors.textLight,
+  },
+  badgeProgress: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.textMedium,
+    textAlign: 'center',
+  },
+  badgeUnlockedText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: colors.success,
+    letterSpacing: 1,
+    marginTop: 4,
   },
 });
