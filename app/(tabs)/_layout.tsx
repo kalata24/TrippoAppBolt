@@ -12,9 +12,9 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: colors.white,
           borderTopWidth: 0,
-          paddingBottom: 25,
-          paddingTop: 12,
-          height: 90,
+          paddingBottom: 8,
+          paddingTop: 8,
+          height: 80,
           elevation: 12,
           shadowColor: colors.primary,
           shadowOffset: { width: 0, height: -4 },
@@ -22,15 +22,15 @@ export default function TabsLayout() {
           shadowRadius: 16,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
-          marginTop: 6,
+          marginTop: 4,
+          marginBottom: 0,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textLight,
         tabBarItemStyle: {
-          paddingVertical: 6,
-          gap: 4,
+          paddingVertical: 4,
         },
         tabBarShowLabel: true,
         tabBarLabelPosition: 'below-icon',
@@ -44,13 +44,13 @@ export default function TabsLayout() {
             <View
               style={{
                 backgroundColor: focused ? colors.accent + '20' : 'transparent',
-                padding: 10,
-                borderRadius: 16,
-                transform: [{ scale: focused ? 1.1 : 1 }],
+                padding: 6,
+                borderRadius: 12,
+                transform: [{ scale: focused ? 1.05 : 1 }],
               }}
             >
               <Plane
-                size={26}
+                size={24}
                 color={focused ? colors.accent : color}
                 strokeWidth={focused ? 2.5 : 2}
               />
@@ -66,13 +66,13 @@ export default function TabsLayout() {
             <View
               style={{
                 backgroundColor: focused ? colors.blue + '20' : 'transparent',
-                padding: 10,
-                borderRadius: 16,
-                transform: [{ scale: focused ? 1.1 : 1 }],
+                padding: 6,
+                borderRadius: 12,
+                transform: [{ scale: focused ? 1.05 : 1 }],
               }}
             >
               <TrendingUp
-                size={26}
+                size={24}
                 color={focused ? colors.blue : color}
                 strokeWidth={focused ? 2.5 : 2}
               />
@@ -88,13 +88,13 @@ export default function TabsLayout() {
             <View
               style={{
                 backgroundColor: focused ? colors.success + '20' : 'transparent',
-                padding: 10,
-                borderRadius: 16,
-                transform: [{ scale: focused ? 1.1 : 1 }],
+                padding: 6,
+                borderRadius: 12,
+                transform: [{ scale: focused ? 1.05 : 1 }],
               }}
             >
               <Map
-                size={26}
+                size={24}
                 color={focused ? colors.success : color}
                 strokeWidth={focused ? 2.5 : 2}
               />
@@ -110,13 +110,13 @@ export default function TabsLayout() {
             <View
               style={{
                 backgroundColor: focused ? colors.error + '20' : 'transparent',
-                padding: 10,
-                borderRadius: 16,
-                transform: [{ scale: focused ? 1.1 : 1 }],
+                padding: 6,
+                borderRadius: 12,
+                transform: [{ scale: focused ? 1.05 : 1 }],
               }}
             >
               <LogOut
-                size={26}
+                size={24}
                 color={focused ? colors.error : color}
                 strokeWidth={focused ? 2.5 : 2}
               />
