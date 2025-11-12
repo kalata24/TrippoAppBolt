@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/components/colors';
-import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, ChevronRight, Bookmark, BookmarkCheck, Sparkles, Ticket } from 'lucide-react-native';
+import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, ChevronRight, Bookmark, BookmarkCheck, Sparkles, Ticket, ArrowUp } from 'lucide-react-native';
 import { useAuth } from '@/lib/auth-context';
 import Notification from '@/components/Notification';
 import SaveTripModal from '@/components/SaveTripModal';
@@ -55,6 +55,7 @@ export default function TripDetail() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
+  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     loadTrip();
@@ -180,17 +181,25 @@ export default function TripDetail() {
   };
 
   const getBookableAttractions = (dayActivities: string[]) => {
-    const bookableKeywords = ['museum', 'tower', 'palace', 'cathedral', 'attraction', 'tour', 'gallery', 'monument', 'castle', 'temple', 'church', 'park'];
+    const ticketedKeywords = ['museum', 'tower', 'palace', 'cathedral', 'gallery', 'monument', 'castle', 'temple', 'zoo', 'aquarium', 'opera', 'theater', 'theatre', 'arena', 'stadium', 'exhibition'];
+    const excludeKeywords = ['walk', 'stroll', 'park', 'street', 'neighborhood', 'district', 'area', 'square', 'market', 'shopping', 'free'];
+
     return dayActivities
       .filter(activity => {
         const lower = activity.toLowerCase();
-        return bookableKeywords.some(keyword => lower.includes(keyword));
+        const hasTicketed = ticketedKeywords.some(keyword => lower.includes(keyword));
+        const hasExcluded = excludeKeywords.some(keyword => lower.includes(keyword));
+        return hasTicketed && !hasExcluded;
       })
       .map(activity => {
         const match = activity.match(/at\s+([^-]+)/i) || activity.match(/visit\s+([^-]+)/i) || activity.match(/explore\s+([^-]+)/i);
         return match ? match[1].trim() : activity.split('-')[0].trim();
       })
       .slice(0, 2);
+  };
+
+  const scrollToTop = () => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   if (loading) {
@@ -229,7 +238,7 @@ export default function TripDetail() {
         </View>
       </LinearGradient>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollViewRef} style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <Animated.View
           style={[
             styles.animatedContainer,
@@ -303,7 +312,7 @@ export default function TripDetail() {
                   onPress={() => getDirections(day)}
                 >
                   <Navigation size={18} color={colors.white} />
-                  <Text style={styles.directionsText}>🗺️ Get Directions for Day {day.day}</Text>
+                  <Text style={styles.directionsText}>Get Directions for Day {day.day}</Text>
                 </TouchableOpacity>
 
                 {getBookableAttractions(day.activities).map((attraction, idx) => (
@@ -313,7 +322,7 @@ export default function TripDetail() {
                     onPress={() => bookTicket(attraction)}
                   >
                     <Ticket size={18} color={colors.white} />
-                    <Text style={styles.bookingText}>🎫 Book Ticket: {attraction}</Text>
+                    <Text style={styles.bookingText}>Book Ticket: {attraction}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -368,6 +377,14 @@ export default function TripDetail() {
             </Text>
           </TouchableOpacity>
         )}
+
+        <TouchableOpacity
+          style={styles.scrollTopButton}
+          onPress={scrollToTop}
+        >
+          <ArrowUp size={20} color={colors.white} />
+          <Text style={styles.scrollTopButtonText}>Go to Top</Text>
+        </TouchableOpacity>
 
         <View style={{ height: 100 }} />
         </Animated.View>
@@ -775,6 +792,28 @@ const styles = StyleSheet.create({
   },
   savedButtonText: {
     color: colors.primary,
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  scrollTopButton: {
+    backgroundColor: colors.blue,
+    paddingVertical: 16,
+    borderRadius: 20,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 12,
+    borderWidth: 2,
+    borderColor: colors.blueLight,
+    shadowColor: colors.blue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  scrollTopButtonText: {
+    color: colors.white,
     fontSize: 17,
     fontWeight: '800',
   },
