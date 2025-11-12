@@ -84,6 +84,53 @@ export default function TripDetail() {
     }
   }, [loading, trip]);
 
+  const validateAndFixTopAttractions = (tripData: TripData): TripData => {
+    if (!tripData.itinerary?.topAttractions || !tripData.itinerary?.days) {
+      return tripData;
+    }
+
+    const validatedAttractions = tripData.itinerary.topAttractions.map(attraction => {
+      const dayMatch = attraction.day.match(/\d+/);
+      if (!dayMatch) return attraction;
+
+      const dayNumber = parseInt(dayMatch[0]);
+      const dayData = tripData.itinerary.days.find(d => d.day === dayNumber);
+
+      if (!dayData) return attraction;
+
+      const isIncluded = dayData.activities.some(activity =>
+        activity.toLowerCase().includes(attraction.name.toLowerCase()) ||
+        attraction.name.toLowerCase().split(' ').every(word =>
+          word.length > 3 && activity.toLowerCase().includes(word)
+        )
+      );
+
+      if (!isIncluded) {
+        for (const day of tripData.itinerary.days) {
+          const foundInDay = day.activities.some(activity =>
+            activity.toLowerCase().includes(attraction.name.toLowerCase()) ||
+            attraction.name.toLowerCase().split(' ').every(word =>
+              word.length > 3 && activity.toLowerCase().includes(word)
+            )
+          );
+          if (foundInDay) {
+            return { ...attraction, day: `Day ${day.day}` };
+          }
+        }
+      }
+
+      return attraction;
+    });
+
+    return {
+      ...tripData,
+      itinerary: {
+        ...tripData.itinerary,
+        topAttractions: validatedAttractions,
+      },
+    };
+  };
+
   const loadTrip = async () => {
     try {
       const { data, error } = await supabase
@@ -93,7 +140,11 @@ export default function TripDetail() {
         .maybeSingle();
 
       if (error) throw error;
-      setTrip(data);
+
+      if (data) {
+        const validatedTrip = validateAndFixTopAttractions(data);
+        setTrip(validatedTrip);
+      }
     } catch (error) {
       console.error('Error loading trip:', error);
     } finally {

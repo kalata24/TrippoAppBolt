@@ -62,6 +62,13 @@ Provide a JSON response with this structure:
   "personalizedMessage": "A short 2-sentence personal message for ${name} about their trip to ${destination}. Keep it warm, exciting, and concise."
 }
 
+CRITICAL REQUIREMENTS FOR TOP ATTRACTIONS:
+- The 3 attractions listed in "topAttractions" MUST be major, iconic attractions in ${destination}
+- Each attraction MUST actually appear in the activities list of the day specified
+- The attraction name in "topAttractions" MUST match exactly (or be a clear substring of) an activity in that day's activities array
+- Example: If topAttractions includes {"name": "Eiffel Tower", "day": "Day 1"}, then Day 1's activities must include something like "Visit Eiffel Tower - 90 minutes"
+- DO NOT list an attraction in topAttractions unless it's genuinely included in the itinerary for that day
+
 IMPORTANT:
 - Always include EXACTLY 3 attractions in topAttractions array
 - Keep personalizedMessage to EXACTLY 2 sentences maximum
