@@ -89,7 +89,9 @@ export default function MyTrips() {
 
       const packingListMap: Record<string, boolean> = {};
       data?.forEach(pl => {
-        packingListMap[pl.trip_id] = pl.items && pl.items.length > 0;
+        const hasCheckedItems = pl.items && Array.isArray(pl.items) &&
+          pl.items.some((item: any) => item.checked === true);
+        packingListMap[pl.trip_id] = hasCheckedItems;
       });
       setPackingLists(packingListMap);
     } catch (error) {
@@ -181,10 +183,30 @@ export default function MyTrips() {
     }
   };
 
-  const handlePackingListClose = () => {
+  const handlePackingListClose = async () => {
+    const closedTripId = packingListTrip?.id;
     setPackingListTrip(null);
-    if (packingListTrip) {
-      loadPackingLists([packingListTrip.id]);
+
+    if (closedTripId) {
+      try {
+        const { data, error } = await supabase
+          .from('packing_lists')
+          .select('items')
+          .eq('trip_id', closedTripId)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        const hasCheckedItems = data?.items && Array.isArray(data.items) &&
+          data.items.some((item: any) => item.checked === true);
+
+        setPackingLists(prev => ({
+          ...prev,
+          [closedTripId]: hasCheckedItems,
+        }));
+      } catch (error) {
+        console.error('Error updating packing list status:', error);
+      }
     }
   };
 
