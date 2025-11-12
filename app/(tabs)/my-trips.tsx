@@ -110,9 +110,8 @@ export default function MyTrips() {
 
       const packingListMap: Record<string, boolean> = {};
       data?.forEach(pl => {
-        const hasCheckedItems = pl.items && Array.isArray(pl.items) &&
-          pl.items.some((item: any) => item.checked === true);
-        packingListMap[pl.trip_id] = hasCheckedItems;
+        const hasItems = pl.items && Array.isArray(pl.items) && pl.items.length > 0;
+        packingListMap[pl.trip_id] = hasItems;
       });
       setPackingLists(packingListMap);
     } catch (error) {
@@ -223,12 +222,11 @@ export default function MyTrips() {
 
         if (error) throw error;
 
-        const hasCheckedItems = data?.items && Array.isArray(data.items) &&
-          data.items.some((item: any) => item.checked === true);
+        const hasItems = data?.items && Array.isArray(data.items) && data.items.length > 0;
 
         setPackingLists(prev => ({
           ...prev,
-          [closedTripId]: hasCheckedItems,
+          [closedTripId]: hasItems,
         }));
       } catch (error) {
         console.error('Error updating packing list status:', error);
