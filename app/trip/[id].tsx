@@ -7,6 +7,7 @@ import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, Ch
 import { useAuth } from '@/lib/auth-context';
 import Notification from '@/components/Notification';
 import SaveTripModal from '@/components/SaveTripModal';
+import ConfirmModal from '@/components/ConfirmModal';
 
 interface Activity {
   name: string;
@@ -49,6 +50,7 @@ export default function TripDetail() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 
   useEffect(() => {
     loadTrip();
@@ -98,6 +100,19 @@ export default function TripDetail() {
     }
   };
 
+  const handleBackPress = () => {
+    if (trip && !trip.is_saved) {
+      setShowUnsavedWarning(true);
+    } else {
+      router.back();
+    }
+  };
+
+  const handleLeaveWithoutSaving = () => {
+    setShowUnsavedWarning(false);
+    router.back();
+  };
+
   const toggleDay = (day: number) => {
     if (expandedDays.includes(day)) {
       setExpandedDays(expandedDays.filter(d => d !== day));
@@ -125,7 +140,7 @@ export default function TripDetail() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <ArrowLeft size={24} color={colors.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{trip.destination}</Text>
@@ -255,6 +270,17 @@ export default function TripDetail() {
         visible={showNotification}
         message='Trip saved in "My Trips"'
         onHide={() => setShowNotification(false)}
+      />
+
+      <ConfirmModal
+        visible={showUnsavedWarning}
+        title="Leave Without Saving?"
+        message="Your trip hasn't been saved yet. If you leave now, you'll lose this itinerary."
+        confirmText="Leave"
+        cancelText="Stay"
+        onConfirm={handleLeaveWithoutSaving}
+        onCancel={() => setShowUnsavedWarning(false)}
+        isDangerous
       />
     </View>
   );

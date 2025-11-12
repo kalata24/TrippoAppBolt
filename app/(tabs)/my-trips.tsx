@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { colors } from '@/components/colors';
-import { Search, MapPin, Calendar, Star, CheckCircle, Clock, ShoppingBag, Luggage } from 'lucide-react-native';
+import { Search, MapPin, Calendar, Star, CheckCircle, Clock, ShoppingBag, Luggage, Trash2, Eye } from 'lucide-react-native';
 import PackingListModal from '@/components/PackingListModal';
+import ConfirmModal from '@/components/ConfirmModal';
 
 interface Trip {
   id: string;
@@ -18,6 +19,7 @@ interface Trip {
   is_saved: boolean;
   travel_month?: string;
   travel_year?: number;
+  has_packing_list?: boolean;
 }
 
 type FilterType = 'all' | 'newest' | 'oldest' | 'favorites' | 'completed' | 'upcoming';
@@ -41,6 +43,8 @@ export default function MyTrips() {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [packingListTrip, setPackingListTrip] = useState<Trip | null>(null);
+  const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
+  const [packingLists, setPackingLists] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (user) {
@@ -63,10 +67,33 @@ export default function MyTrips() {
 
       if (error) throw error;
       setTrips(data || []);
+
+      if (data && data.length > 0) {
+        await loadPackingLists(data.map(t => t.id));
+      }
     } catch (error) {
       console.error('Error loading trips:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPackingLists = async (tripIds: string[]) => {
+    try {
+      const { data, error } = await supabase
+        .from('packing_lists')
+        .select('trip_id, items')
+        .in('trip_id', tripIds);
+
+      if (error) throw error;
+
+      const packingListMap: Record<string, boolean> = {};
+      data?.forEach(pl => {
+        packingListMap[pl.trip_id] = pl.items && pl.items.length > 0;
+      });
+      setPackingLists(packingListMap);
+    } catch (error) {
+      console.error('Error loading packing lists:', error);
     }
   };
 
@@ -133,6 +160,31 @@ export default function MyTrips() {
       ));
     } catch (error) {
       console.error('Error toggling status:', error);
+    }
+  };
+
+  const deleteTrip = async () => {
+    if (!tripToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('trips')
+        .delete()
+        .eq('id', tripToDelete.id);
+
+      if (error) throw error;
+
+      setTrips(trips.filter(trip => trip.id !== tripToDelete.id));
+      setTripToDelete(null);
+    } catch (error) {
+      console.error('Error deleting trip:', error);
+    }
+  };
+
+  const handlePackingListClose = () => {
+    setPackingListTrip(null);
+    if (packingListTrip) {
+      loadPackingLists([packingListTrip.id]);
     }
   };
 
@@ -205,13 +257,36 @@ export default function MyTrips() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.packingButton}
-        onPress={() => setPackingListTrip(item)}
-      >
-        <ShoppingBag size={16} color={colors.accent} />
-        <Text style={styles.packingButtonText}>Add Packing List</Text>
-      </TouchableOpacity>
+      <View style={styles.bottomActions}>
+        <TouchableOpacity
+          style={[
+            styles.packingButton,
+            packingLists[item.id] && styles.viewPackingButton,
+          ]}
+          onPress={() => setPackingListTrip(item)}
+        >
+          {packingLists[item.id] ? (
+            <Eye size={16} color={colors.success} />
+          ) : (
+            <ShoppingBag size={16} color={colors.accent} />
+          )}
+          <Text
+            style={[
+              styles.packingButtonText,
+              packingLists[item.id] && styles.viewPackingButtonText,
+            ]}
+          >
+            {packingLists[item.id] ? 'View Packing List' : 'Add Packing List'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => setTripToDelete(item)}
+        >
+          <Trash2 size={16} color={colors.error} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -316,9 +391,20 @@ export default function MyTrips() {
           tripId={packingListTrip.id}
           tripTitle={packingListTrip.title || `Trip to ${packingListTrip.destination}`}
           userId={user?.id || ''}
-          onClose={() => setPackingListTrip(null)}
+          onClose={handlePackingListClose}
         />
       )}
+
+      <ConfirmModal
+        visible={!!tripToDelete}
+        title="Delete Trip?"
+        message={`Are you sure you want to delete "${tripToDelete?.title || `Trip to ${tripToDelete?.destination}`}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={deleteTrip}
+        onCancel={() => setTripToDelete(null)}
+        isDangerous
+      />
     </View>
   );
 }
@@ -495,7 +581,12 @@ const styles = StyleSheet.create({
   completedButtonText: {
     color: colors.white,
   },
+  bottomActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
   packingButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -506,9 +597,26 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.accent,
   },
+  viewPackingButton: {
+    backgroundColor: '#E8F5E9',
+    borderColor: colors.success,
+  },
   packingButtonText: {
     color: colors.accent,
     fontSize: 14,
     fontWeight: '600',
+  },
+  viewPackingButtonText: {
+    color: colors.success,
+  },
+  deleteButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceLight,
+    borderWidth: 2,
+    borderColor: colors.error,
   },
 });
