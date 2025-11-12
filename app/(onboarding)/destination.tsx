@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { colors } from '@/components/colors';
 import { ChevronDown } from 'lucide-react-native';
 import StepProgress from '@/components/StepProgress';
+import CalendarPicker from '@/components/CalendarPicker';
 
 let DateTimePicker: any = null;
 if (Platform.OS !== 'web') {
@@ -159,29 +160,17 @@ export default function Destination() {
                 <View style={styles.modalOverlay}>
                   <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Select Start Date</Text>
-                    <TextInput
-                      style={styles.dateInput}
-                      placeholder="YYYY-MM-DD"
-                      value={startDate ? startDate.toISOString().split('T')[0] : ''}
-                      onChangeText={(text) => {
-                        if (text.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                          const date = new Date(text);
-                          if (!isNaN(date.getTime())) {
-                            setStartDate(date);
-                            if (endDate && date > endDate) {
-                              setEndDate(undefined);
-                            }
-                          }
+                    <CalendarPicker
+                      selectedDate={startDate}
+                      minimumDate={new Date()}
+                      onSelectDate={(date) => {
+                        setStartDate(date);
+                        if (endDate && date > endDate) {
+                          setEndDate(undefined);
                         }
+                        setShowStartPicker(false);
                       }}
-                      {...(Platform.OS === 'web' && { type: 'date' } as any)}
                     />
-                    <TouchableOpacity
-                      style={styles.modalButton}
-                      onPress={() => setShowStartPicker(false)}
-                    >
-                      <Text style={styles.modalButtonText}>Done</Text>
-                    </TouchableOpacity>
                   </View>
                 </View>
               </Modal>
@@ -197,26 +186,14 @@ export default function Destination() {
                 <View style={styles.modalOverlay}>
                   <View style={styles.modalContent}>
                     <Text style={styles.modalTitle}>Select End Date</Text>
-                    <TextInput
-                      style={styles.dateInput}
-                      placeholder="YYYY-MM-DD"
-                      value={endDate ? endDate.toISOString().split('T')[0] : ''}
-                      onChangeText={(text) => {
-                        if (text.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                          const date = new Date(text);
-                          if (!isNaN(date.getTime())) {
-                            setEndDate(date);
-                          }
-                        }
+                    <CalendarPicker
+                      selectedDate={endDate}
+                      minimumDate={startDate || new Date()}
+                      onSelectDate={(date) => {
+                        setEndDate(date);
+                        setShowEndPicker(false);
                       }}
-                      {...(Platform.OS === 'web' && { type: 'date' } as any)}
                     />
-                    <TouchableOpacity
-                      style={styles.modalButton}
-                      onPress={() => setShowEndPicker(false)}
-                    >
-                      <Text style={styles.modalButtonText}>Done</Text>
-                    </TouchableOpacity>
                   </View>
                 </View>
               </Modal>
@@ -452,9 +429,9 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: colors.white,
     borderRadius: 20,
-    padding: 24,
-    width: '80%',
-    maxWidth: 400,
+    padding: 20,
+    width: '90%',
+    maxWidth: 380,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -467,27 +444,5 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginBottom: 16,
     textAlign: 'center',
-  },
-  dateInput: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 14,
-    color: colors.text,
-    backgroundColor: colors.white,
-    marginBottom: 16,
-  },
-  modalButton: {
-    backgroundColor: colors.accent,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  modalButtonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
