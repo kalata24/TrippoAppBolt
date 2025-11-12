@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { colors } from '@/components/colors';
+import { Sparkles } from 'lucide-react-native';
 
 const FOODS = ['Burger🍔', 'Pizza🍕', 'Pasta🍝', 'Sushi🍣', 'Steak🥩', 'Ramen🍜'];
 
@@ -30,12 +31,30 @@ export default function Food() {
     });
   };
 
+  const isLocalFoodSelected = selected.includes('Local Food');
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.step}>Step 2 of 5</Text>
         <Text style={styles.title}>Pick your favorite foods</Text>
         <Text style={styles.subtitle}>Select up to 3</Text>
+
+        <TouchableOpacity
+          style={[
+            styles.specialItem,
+            isLocalFoodSelected && styles.specialItemSelected
+          ]}
+          onPress={() => toggle('Local Food')}
+        >
+          <View style={styles.specialContent}>
+            <Sparkles size={24} color={isLocalFoodSelected ? colors.accent : colors.primary} />
+            <Text style={[styles.specialText, isLocalFoodSelected && styles.specialTextSelected]}>
+              Local Food
+            </Text>
+            <Text style={styles.specialSubtext}>Discover authentic local cuisine</Text>
+          </View>
+        </TouchableOpacity>
 
         <View style={styles.grid}>
           {FOODS.map((food, i) => (
@@ -69,6 +88,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingTop: 60,
+    paddingBottom: 100,
   },
   step: {
     fontSize: 14,
@@ -86,6 +106,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textLight,
     marginBottom: 24,
+  },
+  specialItem: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 24,
+    borderWidth: 3,
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  specialItemSelected: {
+    backgroundColor: colors.surfaceLight,
+    borderColor: colors.accent,
+    shadowColor: colors.accent,
+    shadowOpacity: 0.2,
+  },
+  specialContent: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  specialText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  specialTextSelected: {
+    color: colors.accent,
+  },
+  specialSubtext: {
+    fontSize: 12,
+    color: colors.textLight,
+    textAlign: 'center',
   },
   grid: {
     flexDirection: 'row',

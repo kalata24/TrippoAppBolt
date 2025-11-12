@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/lib/auth-context';
 import { colors } from '@/components/colors';
@@ -11,12 +11,7 @@ export default function Organize() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Trippo</Text>
-        <Text style={styles.subtitle}>Plan your perfect adventure</Text>
-      </View>
-
-      <View style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         <View style={styles.welcomeCard}>
           <Text style={styles.welcomeTitle}>Welcome, {username}! 🎉</Text>
           <Text style={styles.welcomeMessage}>
@@ -41,7 +36,7 @@ export default function Organize() {
             4. Enjoy your adventure!
           </Text>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -51,27 +46,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: colors.primary,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.white,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.white,
-    opacity: 0.9,
-  },
   content: {
     flex: 1,
+  },
+  contentContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 60,
+    paddingBottom: 100,
   },
   welcomeCard: {
     backgroundColor: colors.white,
