@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, Animated, ScrollView, ActivityIndicator } from 'react-native';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BarChart3, Plane, Calendar, CheckCircle, MapPin, Clock, Award } from 'lucide-react-native';
 import { colors } from '@/components/colors';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface TripStats {
   totalPlanned: number;
@@ -57,11 +58,13 @@ export default function Dashboard() {
     ]).start();
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      loadStats();
-    }
-  }, [user]);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user) {
+        loadStats();
+      }
+    }, [user])
+  );
 
   const loadStats = async () => {
     try {
