@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Animated, Linking } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useEffect, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/components/colors';
-import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, ChevronRight, Bookmark, BookmarkCheck, Sparkles } from 'lucide-react-native';
+import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, ChevronRight, Bookmark, BookmarkCheck, Sparkles, Ticket } from 'lucide-react-native';
 import { useAuth } from '@/lib/auth-context';
 import Notification from '@/components/Notification';
 import SaveTripModal from '@/components/SaveTripModal';
@@ -148,6 +148,51 @@ export default function TripDetail() {
     }
   };
 
+  const getDirections = (dayData: DayItinerary) => {
+    const waypoints = dayData.activities
+      .filter(activity => !activity.toLowerCase().includes('hotel') &&
+                         !activity.toLowerCase().includes('check in') &&
+                         !activity.toLowerCase().includes('rest'))
+      .map(activity => {
+        const match = activity.match(/at\s+([^-]+)/i) || activity.match(/visit\s+([^-]+)/i) || activity.match(/explore\s+([^-]+)/i);
+        return match ? match[1].trim() : activity.split('-')[0].trim();
+      });
+
+    if (waypoints.length === 0) return;
+
+    const destination = `${trip?.destination}`;
+    const waypointsParam = waypoints.slice(0, -1).map(w => `${w}, ${destination}`).join('|');
+    const finalDestination = waypoints[waypoints.length - 1] + ', ' + destination;
+
+    let url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(finalDestination)}&travelmode=walking`;
+
+    if (waypointsParam) {
+      url += `&waypoints=${encodeURIComponent(waypointsParam)}`;
+    }
+
+    Linking.openURL(url);
+  };
+
+  const bookTicket = (attractionName: string) => {
+    const searchQuery = `${attractionName} ${trip?.destination}`;
+    const url = `https://www.getyourguide.com/s/?q=${encodeURIComponent(searchQuery)}`;
+    Linking.openURL(url);
+  };
+
+  const getBookableAttractions = (dayActivities: string[]) => {
+    const bookableKeywords = ['museum', 'tower', 'palace', 'cathedral', 'attraction', 'tour', 'gallery', 'monument', 'castle', 'temple', 'church', 'park'];
+    return dayActivities
+      .filter(activity => {
+        const lower = activity.toLowerCase();
+        return bookableKeywords.some(keyword => lower.includes(keyword));
+      })
+      .map(activity => {
+        const match = activity.match(/at\s+([^-]+)/i) || activity.match(/visit\s+([^-]+)/i) || activity.match(/explore\s+([^-]+)/i);
+        return match ? match[1].trim() : activity.split('-')[0].trim();
+      })
+      .slice(0, 2);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -227,32 +272,50 @@ export default function TripDetail() {
                 ))}
 
                 {(day.duration || day.distance || day.steps) && (
-                  <View style={styles.statsRow}>
-                  {day.duration && (
-                    <View style={styles.statBadge}>
-                      <Clock size={14} color={colors.text} />
-                      <Text style={styles.statBadgeText}>{day.duration}</Text>
+                  <View style={styles.statsContainer}>
+                    <View style={styles.statsTopRow}>
+                      {day.duration && (
+                        <View style={styles.statBadge}>
+                          <Clock size={16} color={colors.text} />
+                          <Text style={styles.statBadgeText}>{day.duration}</Text>
+                        </View>
+                      )}
+                      {day.distance && (
+                        <View style={styles.statBadge}>
+                          <MapPin size={16} color={colors.text} />
+                          <Text style={styles.statBadgeText}>{day.distance}</Text>
+                        </View>
+                      )}
                     </View>
-                  )}
-                  {day.distance && (
-                    <View style={styles.statBadge}>
-                      <MapPin size={14} color={colors.text} />
-                      <Text style={styles.statBadgeText}>{day.distance}</Text>
-                    </View>
-                  )}
-                  {day.steps && (
-                    <View style={styles.statBadge}>
-                      <Footprints size={14} color={colors.text} />
-                      <Text style={styles.statBadgeText}>{day.steps}</Text>
-                    </View>
-                  )}
+                    {day.steps && (
+                      <View style={styles.stepsRow}>
+                        <View style={styles.statBadge}>
+                          <Footprints size={16} color={colors.text} />
+                          <Text style={styles.statBadgeText}>{day.steps}</Text>
+                        </View>
+                      </View>
+                    )}
                   </View>
                 )}
 
-                <TouchableOpacity style={styles.directionsButton}>
-                  <Navigation size={16} color={colors.white} />
-                  <Text style={styles.directionsText}>Get Directions for Day {day.day}</Text>
+                <TouchableOpacity
+                  style={styles.directionsButton}
+                  onPress={() => getDirections(day)}
+                >
+                  <Navigation size={18} color={colors.white} />
+                  <Text style={styles.directionsText}>🗺️ Get Directions for Day {day.day}</Text>
                 </TouchableOpacity>
+
+                {getBookableAttractions(day.activities).map((attraction, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.bookingButton}
+                    onPress={() => bookTicket(attraction)}
+                  >
+                    <Ticket size={18} color={colors.white} />
+                    <Text style={styles.bookingText}>🎫 Book Ticket: {attraction}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             )}
           </View>
@@ -492,26 +555,34 @@ const styles = StyleSheet.create({
     color: colors.text,
     lineHeight: 20,
   },
-  statsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+  statsContainer: {
     marginTop: 16,
     marginBottom: 16,
+  },
+  statsTopRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 8,
+  },
+  stepsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   statBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     backgroundColor: colors.borderYellow,
-    borderRadius: 20,
+    borderRadius: 24,
     borderWidth: 2,
     borderColor: colors.borderOrange,
+    flex: 1,
+    justifyContent: 'center',
   },
   statBadgeText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.textDark,
   },
@@ -528,12 +599,35 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 5,
+    marginBottom: 10,
   },
   directionsText: {
     color: colors.white,
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
+  },
+  bookingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: colors.accent,
+    paddingVertical: 16,
+    borderRadius: 16,
+    shadowColor: colors.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 5,
+    marginBottom: 10,
+  },
+  bookingText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+    flexShrink: 1,
   },
   attractionsCard: {
     backgroundColor: colors.white,
