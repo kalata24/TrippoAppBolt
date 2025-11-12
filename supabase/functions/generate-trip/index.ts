@@ -50,6 +50,8 @@ CRITICAL REQUIREMENTS:
    - Restaurants and cafes (match the food preferences: ${foods.join(', ')})
    - Neighborhoods and districts to explore
    - Specific streets, squares, and areas
+   - DO NOT suggest specific hotels or accommodation names
+   - DO NOT include check-in or check-out activities
 3. Match activities to personality traits: ${personalities.join(', ')}
    - If "Adventurer": Include outdoor activities, hiking, unique experiences
    - If "Foodie": Include famous restaurants, food markets, local cuisine spots
