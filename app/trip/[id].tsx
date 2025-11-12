@@ -3,7 +3,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/components/colors';
-import { ArrowLeft, Clock, MapPin, TrendingUp, Bookmark } from 'lucide-react-native';
+import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star } from 'lucide-react-native';
+import StepProgress from '@/components/StepProgress';
 
 interface Activity {
   name: string;
@@ -90,19 +91,22 @@ export default function TripDetail() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ArrowLeft size={24} color={colors.primary} />
+          <ArrowLeft size={24} color={colors.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Your Trip</Text>
+        <Text style={styles.headerTitle}>{trip.destination}</Text>
       </View>
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {trip.itinerary.days.map((day) => (
           <View key={day.day} style={styles.dayCard}>
             <TouchableOpacity
               style={styles.dayHeader}
               onPress={() => toggleDay(day.day)}
             >
-              <Text style={styles.dayTitle}>Day {day.day}</Text>
+              <View style={styles.dayHeaderLeft}>
+                <Text style={styles.dayTitle}>Day {day.day}</Text>
+                <Text style={styles.tapHint}>Tap a card to expand</Text>
+              </View>
               <Text style={styles.dayToggle}>
                 {expandedDays.includes(day.day) ? '▼' : '▶'}
               </Text>
@@ -114,34 +118,36 @@ export default function TripDetail() {
 
                 {day.activities.map((activity, index) => (
                   <View key={index} style={styles.activity}>
-                    <View style={styles.activityDot} />
+                    <View style={styles.activityIcon}>
+                      <Text style={styles.activityEmoji}>{getActivityEmoji(activity)}</Text>
+                    </View>
                     <Text style={styles.activityText}>{activity}</Text>
                   </View>
                 ))}
 
-                <View style={styles.stats}>
+                <View style={styles.statsRow}>
                   {day.duration && (
-                    <View style={styles.stat}>
-                      <Clock size={16} color={colors.primary} />
-                      <Text style={styles.statText}>{day.duration}</Text>
+                    <View style={styles.statBadge}>
+                      <Clock size={14} color={colors.text} />
+                      <Text style={styles.statBadgeText}>{day.duration}</Text>
                     </View>
                   )}
                   {day.distance && (
-                    <View style={styles.stat}>
-                      <MapPin size={16} color={colors.primary} />
-                      <Text style={styles.statText}>{day.distance}</Text>
+                    <View style={styles.statBadge}>
+                      <MapPin size={14} color={colors.text} />
+                      <Text style={styles.statBadgeText}>{day.distance}</Text>
                     </View>
                   )}
                   {day.steps && (
-                    <View style={styles.stat}>
-                      <TrendingUp size={16} color={colors.primary} />
-                      <Text style={styles.statText}>{day.steps}</Text>
+                    <View style={styles.statBadge}>
+                      <Footprints size={14} color={colors.text} />
+                      <Text style={styles.statBadgeText}>{day.steps}</Text>
                     </View>
                   )}
                 </View>
 
                 <TouchableOpacity style={styles.directionsButton}>
-                  <MapPin size={16} color={colors.white} />
+                  <Navigation size={16} color={colors.white} />
                   <Text style={styles.directionsText}>Get Directions for Day {day.day}</Text>
                 </TouchableOpacity>
               </View>
@@ -152,19 +158,19 @@ export default function TripDetail() {
         {trip.itinerary.topAttractions && trip.itinerary.topAttractions.length > 0 && (
           <View style={styles.attractionsCard}>
             <View style={styles.attractionsHeader}>
-              <Text style={styles.attractionsEmoji}>⭐</Text>
+              <Star size={20} color={colors.accentYellow} fill={colors.accentYellow} />
               <Text style={styles.attractionsTitle}>Top 3 Must-Visit</Text>
             </View>
             <Text style={styles.attractionsSubtitle}>Don't miss these iconic attractions!</Text>
 
             {trip.itinerary.topAttractions.slice(0, 3).map((attraction, index) => (
               <View key={index} style={styles.attractionItem}>
-                <View style={styles.attractionNumber}>
+                <View style={[styles.attractionNumber, { backgroundColor: [colors.blue, colors.green, colors.accent][index] }]}>
                   <Text style={styles.attractionNumberText}>{index + 1}</Text>
                 </View>
                 <View style={styles.attractionContent}>
                   <Text style={styles.attractionName}>{attraction.name}</Text>
-                  <Text style={styles.attractionDay}>📍 {attraction.day}</Text>
+                  <Text style={styles.attractionDay}>📍 Included in {attraction.day}</Text>
                 </View>
               </View>
             ))}
@@ -173,18 +179,33 @@ export default function TripDetail() {
 
         {trip.itinerary.personalizedMessage && (
           <View style={styles.messageCard}>
-            <Text style={styles.messageTitle}>Have an Amazing Trip, {trip.name}! 🎉</Text>
+            <Text style={styles.messageTitle}>Have an Amazing Trip, {trip.name}!</Text>
             <Text style={styles.messageText}>{trip.itinerary.personalizedMessage}</Text>
+            <Text style={styles.messageEmoji}>🎉✨</Text>
           </View>
         )}
 
         <TouchableOpacity style={styles.saveButton}>
-          <Bookmark size={20} color={colors.white} />
-          <Text style={styles.saveButtonText}>Save this trip</Text>
+          <Text style={styles.saveButtonText}>✅ Trip Saved!</Text>
         </TouchableOpacity>
+
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
+}
+
+function getActivityEmoji(activity: string): string {
+  const lowerActivity = activity.toLowerCase();
+  if (lowerActivity.includes('plane') || lowerActivity.includes('airport') || lowerActivity.includes('fly') || lowerActivity.includes('flight')) return '✈️';
+  if (lowerActivity.includes('food') || lowerActivity.includes('lunch') || lowerActivity.includes('dinner') || lowerActivity.includes('breakfast') || lowerActivity.includes('eat')) return '🍴';
+  if (lowerActivity.includes('hotel') || lowerActivity.includes('check in') || lowerActivity.includes('resort')) return '🏨';
+  if (lowerActivity.includes('beach') || lowerActivity.includes('water')) return '🏖️';
+  if (lowerActivity.includes('museum') || lowerActivity.includes('gallery')) return '🏛️';
+  if (lowerActivity.includes('sunset') || lowerActivity.includes('cocktail')) return '🍹';
+  if (lowerActivity.includes('relax')) return '🧘';
+  if (lowerActivity.includes('explore') || lowerActivity.includes('walk')) return '🚶';
+  return '📍';
 }
 
 const styles = StyleSheet.create({
@@ -206,17 +227,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 16,
-    backgroundColor: colors.surfaceLight,
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: colors.success,
   },
   backButton: {
     marginRight: 12,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.primary,
+    fontSize: 22,
+    fontWeight: '800',
+    color: colors.white,
   },
   scrollView: {
     flex: 1,
@@ -224,27 +245,43 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   dayCard: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    marginBottom: 12,
+    backgroundColor: colors.cardBg,
+    borderRadius: 16,
+    marginBottom: 16,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   dayHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: colors.surface,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  dayHeaderLeft: {
+    flex: 1,
   },
   dayTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.primary,
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textDark,
+    marginBottom: 2,
+  },
+  tapHint: {
+    fontSize: 11,
+    color: colors.textLight,
   },
   dayToggle: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.text,
+    fontWeight: '700',
   },
   dayContent: {
     padding: 16,
@@ -258,15 +295,24 @@ const styles = StyleSheet.create({
   activity: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 14,
+    backgroundColor: colors.white,
+    padding: 12,
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
   },
-  activityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.accent,
-    marginTop: 6,
+  activityIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.surfaceLight,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
+  },
+  activityEmoji: {
+    fontSize: 16,
   },
   activityText: {
     flex: 1,
@@ -274,48 +320,60 @@ const styles = StyleSheet.create({
     color: colors.text,
     lineHeight: 20,
   },
-  stats: {
+  statsRow: {
     flexDirection: 'row',
-    gap: 16,
+    flexWrap: 'wrap',
+    gap: 8,
     marginTop: 16,
     marginBottom: 16,
   },
-  stat: {
+  statBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: colors.surfaceLight,
+    paddingVertical: 8,
+    backgroundColor: colors.borderYellow,
     borderRadius: 20,
+    borderWidth: 2,
+    borderColor: colors.borderOrange,
   },
-  statText: {
+  statBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: colors.text,
+    fontWeight: '700',
+    color: colors.textDark,
   },
   directionsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: colors.success,
+    paddingVertical: 14,
+    borderRadius: 12,
+    shadowColor: colors.success,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   directionsText: {
     color: colors.white,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   attractionsCard: {
-    backgroundColor: colors.surfaceLight,
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 12,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: colors.accent,
+    backgroundColor: colors.cardBg,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 3,
+    borderColor: colors.borderOrange,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   attractionsHeader: {
     flexDirection: 'row',
@@ -345,10 +403,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   attractionNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
+    width: 40,
+    height: 40,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -373,38 +430,50 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   messageCard: {
-    backgroundColor: colors.surfaceLight,
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 12,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: colors.accent,
+    backgroundColor: colors.cardBg,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 3,
+    borderColor: colors.borderOrange,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   messageTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
-    color: colors.primary,
-    marginBottom: 8,
+    color: colors.textDark,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   messageText: {
     fontSize: 14,
     color: colors.text,
-    lineHeight: 20,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  messageEmoji: {
+    fontSize: 24,
   },
   saveButton: {
-    flexDirection: 'row',
+    backgroundColor: colors.accentYellow,
+    paddingVertical: 16,
+    borderRadius: 16,
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.accent,
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginBottom: 40,
+    shadowColor: colors.accentYellow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
   },
   saveButtonText: {
-    color: colors.white,
+    color: colors.textDark,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '800',
   },
 });

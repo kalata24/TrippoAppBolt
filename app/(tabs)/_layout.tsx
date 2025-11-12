@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Zap, Compass, MapPin, LogOut } from 'lucide-react-native';
+import { Plane, BarChart3, Map, LogOut } from 'lucide-react-native';
 import { colors } from '@/components/colors';
 
 export default function TabsLayout() {
@@ -9,13 +9,20 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.white,
-          borderTopColor: colors.border,
+          borderTopWidth: 0,
           paddingBottom: 8,
           paddingTop: 8,
+          height: 60,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 4,
         },
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textLight,
@@ -25,21 +32,21 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Organize',
-          tabBarIcon: ({ color, size }) => <Zap size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Plane size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="dashboard"
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <BarChart3 size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="my-trips"
         options={{
           title: 'My trips',
-          tabBarIcon: ({ color, size }) => <MapPin size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
         }}
       />
       <Tabs.Screen

@@ -3,8 +3,16 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { colors } from '@/components/colors';
 import { Heart } from 'lucide-react-native';
+import StepProgress from '@/components/StepProgress';
 
-const TRAITS = ['Adventurer⛺', 'Foodie🍰', 'Art Lover🎨', 'Photographer📸', 'Concert Lover🎵', 'Sports Fan⚽'];
+const TRAITS = [
+  { name: 'Adventurer', emoji: '⛺' },
+  { name: 'Foodie', emoji: '🍰' },
+  { name: 'Art Lover', emoji: '🎨' },
+  { name: 'Photographer', emoji: '📸' },
+  { name: 'Concert Lover', emoji: '🎵' },
+  { name: 'Sports Fan', emoji: '⚽' },
+];
 
 export default function Personality() {
   const router = useRouter();
@@ -34,49 +42,63 @@ export default function Personality() {
   const isLocalCultureSelected = selected.includes('Local Culture');
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.step}>Step 3 of 5</Text>
-        <Text style={styles.title}>What describes you best?</Text>
-        <Text style={styles.subtitle}>Select up to 3</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <StepProgress
+          currentStep={3}
+          totalSteps={5}
+          steps={['Destination', 'Food', 'Personality', 'Your Info', 'Your Trip']}
+        />
+      </View>
+      <ScrollView style={styles.scrollContent}>
+        <View style={styles.card}>
+          <Text style={styles.title}>What describes you best?</Text>
+          <Text style={styles.subtitle}>Select up to 3</Text>
 
-        <TouchableOpacity
-          style={[
-            styles.specialItem,
-            isLocalCultureSelected && styles.specialItemSelected
-          ]}
-          onPress={() => toggle('Local Culture')}
-        >
-          <View style={styles.specialContent}>
-            <Heart size={24} color={isLocalCultureSelected ? colors.accent : colors.primary} fill={isLocalCultureSelected ? colors.accent : 'transparent'} />
+          <View style={styles.grid}>
+            {TRAITS.map((trait, i) => (
+              <TouchableOpacity
+                key={i}
+                style={[styles.traitCard, selected.includes(trait.name) && styles.traitCardSelected]}
+                onPress={() => toggle(trait.name)}
+              >
+                <Text style={styles.traitEmoji}>{trait.emoji}</Text>
+                <Text style={styles.traitName}>{trait.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.specialItem,
+              isLocalCultureSelected && styles.specialItemSelected
+            ]}
+            onPress={() => toggle('Local Culture')}
+          >
+            <Heart size={28} color={isLocalCultureSelected ? colors.white : colors.pink} fill={isLocalCultureSelected ? colors.white : colors.pink} />
             <Text style={[styles.specialText, isLocalCultureSelected && styles.specialTextSelected]}>
               Local Culture
             </Text>
-            <Text style={styles.specialSubtext}>Experience authentic traditions</Text>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
-        <View style={styles.grid}>
-          {TRAITS.map((trait, i) => (
+          <View style={styles.buttonRow}>
             <TouchableOpacity
-              key={i}
-              style={[styles.item, selected.includes(trait) && styles.itemSelected]}
-              onPress={() => toggle(trait)}
+              style={styles.backButton}
+              onPress={() => router.back()}
             >
-              <Text style={styles.itemText}>{trait}</Text>
+              <Text style={styles.backButtonText}>← Back</Text>
             </TouchableOpacity>
-          ))}
+            <TouchableOpacity
+              style={[styles.button, selected.length === 0 && styles.buttonDisabled]}
+              onPress={handleContinue}
+              disabled={selected.length === 0}
+            >
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <TouchableOpacity
-          style={[styles.button, selected.length === 0 && styles.buttonDisabled]}
-          onPress={handleContinue}
-          disabled={selected.length === 0}
-        >
-          <Text style={styles.buttonText}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -85,16 +107,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
-    padding: 20,
-    paddingTop: 60,
-    paddingBottom: 100,
+  header: {
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    backgroundColor: colors.background,
   },
-  step: {
-    fontSize: 14,
-    color: colors.accent,
-    fontWeight: '600',
-    marginBottom: 8,
+  scrollContent: {
+    flex: 1,
+  },
+  card: {
+    margin: 20,
+    marginTop: 0,
+    backgroundColor: colors.cardBg,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   title: {
     fontSize: 24,
@@ -105,69 +137,86 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: colors.textLight,
-    marginBottom: 24,
-  },
-  specialItem: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 24,
-    borderWidth: 3,
-    borderColor: colors.primary,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  specialItemSelected: {
-    backgroundColor: colors.surfaceLight,
-    borderColor: colors.accent,
-    shadowColor: colors.accent,
-    shadowOpacity: 0.2,
-  },
-  specialContent: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  specialText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  specialTextSelected: {
-    color: colors.accent,
-  },
-  specialSubtext: {
-    fontSize: 12,
-    color: colors.textLight,
-    textAlign: 'center',
+    marginBottom: 20,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 20,
   },
-  item: {
+  traitCard: {
     width: '47%',
     backgroundColor: colors.white,
-    borderRadius: 12,
-    paddingVertical: 20,
+    borderRadius: 16,
+    padding: 20,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 3,
+    borderColor: colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  itemSelected: {
-    borderColor: colors.accent,
+  traitCardSelected: {
+    borderColor: colors.borderOrange,
     backgroundColor: colors.surfaceLight,
   },
-  itemText: {
-    fontSize: 16,
+  traitEmoji: {
+    fontSize: 40,
+    marginBottom: 8,
+  },
+  traitName: {
+    fontSize: 14,
     fontWeight: '600',
     color: colors.text,
+    textAlign: 'center',
+  },
+  specialItem: {
+    backgroundColor: colors.pink,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    shadowColor: colors.pink,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  specialItemSelected: {
+    backgroundColor: colors.accent,
+  },
+  specialText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  specialTextSelected: {
+    color: colors.white,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  backButton: {
+    flex: 1,
+    backgroundColor: colors.border,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '600',
   },
   button: {
+    flex: 2,
     backgroundColor: colors.accent,
     paddingVertical: 14,
     borderRadius: 12,
@@ -176,7 +225,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   buttonDisabled: {
     opacity: 0.5,

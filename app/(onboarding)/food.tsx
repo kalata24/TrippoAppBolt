@@ -2,9 +2,21 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { colors } from '@/components/colors';
-import { Sparkles } from 'lucide-react-native';
+import { Globe } from 'lucide-react-native';
+import StepProgress from '@/components/StepProgress';
 
-const FOODS = ['Burger🍔', 'Pizza🍕', 'Pasta🍝', 'Sushi🍣', 'Steak🥩', 'Ramen🍜'];
+const FOODS = [
+  { name: 'Burger', emoji: '🍔' },
+  { name: 'Hot Dog', emoji: '🌭' },
+  { name: 'Pizza', emoji: '🍕' },
+  { name: 'Pasta', emoji: '🍝' },
+  { name: 'Steak', emoji: '🥩' },
+  { name: 'Kebab', emoji: '🥙' },
+  { name: 'Ramen', emoji: '🍜' },
+  { name: 'Sushi', emoji: '🍣' },
+  { name: 'Salad', emoji: '🥗' },
+  { name: 'Dessert', emoji: '🍰' },
+];
 
 export default function Food() {
   const router = useRouter();
@@ -34,49 +46,63 @@ export default function Food() {
   const isLocalFoodSelected = selected.includes('Local Food');
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.step}>Step 2 of 5</Text>
-        <Text style={styles.title}>Pick your favorite foods</Text>
-        <Text style={styles.subtitle}>Select up to 3</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <StepProgress
+          currentStep={2}
+          totalSteps={5}
+          steps={['Destination', 'Food', 'Personality', 'Your Info', 'Your Trip']}
+        />
+      </View>
+      <ScrollView style={styles.scrollContent}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Pick your favorite foods</Text>
+          <Text style={styles.subtitle}>Select up to 3</Text>
 
-        <TouchableOpacity
-          style={[
-            styles.specialItem,
-            isLocalFoodSelected && styles.specialItemSelected
-          ]}
-          onPress={() => toggle('Local Food')}
-        >
-          <View style={styles.specialContent}>
-            <Sparkles size={24} color={isLocalFoodSelected ? colors.accent : colors.primary} />
+          <View style={styles.grid}>
+            {FOODS.map((food, i) => (
+              <TouchableOpacity
+                key={i}
+                style={[styles.foodCard, selected.includes(food.name) && styles.foodCardSelected]}
+                onPress={() => toggle(food.name)}
+              >
+                <Text style={styles.foodEmoji}>{food.emoji}</Text>
+                <Text style={styles.foodName}>{food.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.specialItem,
+              isLocalFoodSelected && styles.specialItemSelected
+            ]}
+            onPress={() => toggle('Local Food')}
+          >
+            <Globe size={32} color={isLocalFoodSelected ? colors.white : colors.accent} />
             <Text style={[styles.specialText, isLocalFoodSelected && styles.specialTextSelected]}>
               Local Food
             </Text>
-            <Text style={styles.specialSubtext}>Discover authentic local cuisine</Text>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
-        <View style={styles.grid}>
-          {FOODS.map((food, i) => (
+          <View style={styles.buttonRow}>
             <TouchableOpacity
-              key={i}
-              style={[styles.item, selected.includes(food) && styles.itemSelected]}
-              onPress={() => toggle(food)}
+              style={styles.backButton}
+              onPress={() => router.back()}
             >
-              <Text style={styles.itemText}>{food}</Text>
+              <Text style={styles.backButtonText}>← Back</Text>
             </TouchableOpacity>
-          ))}
+            <TouchableOpacity
+              style={[styles.button, selected.length === 0 && styles.buttonDisabled]}
+              onPress={handleContinue}
+              disabled={selected.length === 0}
+            >
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <TouchableOpacity
-          style={[styles.button, selected.length === 0 && styles.buttonDisabled]}
-          onPress={handleContinue}
-          disabled={selected.length === 0}
-        >
-          <Text style={styles.buttonText}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -85,16 +111,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
-    padding: 20,
-    paddingTop: 60,
-    paddingBottom: 100,
+  header: {
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    backgroundColor: colors.background,
   },
-  step: {
-    fontSize: 14,
-    color: colors.accent,
-    fontWeight: '600',
-    marginBottom: 8,
+  scrollContent: {
+    flex: 1,
+  },
+  card: {
+    margin: 20,
+    marginTop: 0,
+    backgroundColor: colors.cardBg,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   title: {
     fontSize: 24,
@@ -105,69 +141,87 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: colors.textLight,
-    marginBottom: 24,
-  },
-  specialItem: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 24,
-    borderWidth: 3,
-    borderColor: colors.primary,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  specialItemSelected: {
-    backgroundColor: colors.surfaceLight,
-    borderColor: colors.accent,
-    shadowColor: colors.accent,
-    shadowOpacity: 0.2,
-  },
-  specialContent: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  specialText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  specialTextSelected: {
-    color: colors.accent,
-  },
-  specialSubtext: {
-    fontSize: 12,
-    color: colors.textLight,
-    textAlign: 'center',
+    marginBottom: 20,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 20,
   },
-  item: {
-    width: '47%',
+  foodCard: {
+    width: '30%',
+    aspectRatio: 1,
     backgroundColor: colors.white,
-    borderRadius: 12,
-    paddingVertical: 20,
+    borderRadius: 16,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  itemSelected: {
-    borderColor: colors.accent,
+  foodCardSelected: {
+    borderColor: colors.borderOrange,
     backgroundColor: colors.surfaceLight,
   },
-  itemText: {
-    fontSize: 16,
+  foodEmoji: {
+    fontSize: 40,
+    marginBottom: 6,
+  },
+  foodName: {
+    fontSize: 12,
     fontWeight: '600',
     color: colors.text,
+    textAlign: 'center',
+  },
+  specialItem: {
+    backgroundColor: colors.accentYellow,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    shadowColor: colors.accentYellow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  specialItemSelected: {
+    backgroundColor: colors.accent,
+  },
+  specialText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  specialTextSelected: {
+    color: colors.white,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  backButton: {
+    flex: 1,
+    backgroundColor: colors.border,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '600',
   },
   button: {
+    flex: 2,
     backgroundColor: colors.accent,
     paddingVertical: 14,
     borderRadius: 12,
@@ -176,7 +230,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   buttonDisabled: {
     opacity: 0.5,

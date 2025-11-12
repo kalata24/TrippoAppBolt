@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { colors } from '@/components/colors';
+import StepProgress from '@/components/StepProgress';
 
 export default function Info() {
   const router = useRouter();
@@ -27,10 +28,17 @@ export default function Info() {
   const isValid = name && age && location;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.step}>Step 4 of 5</Text>
-        <Text style={styles.title}>Enter your information</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <StepProgress
+          currentStep={4}
+          totalSteps={5}
+          steps={['Destination', 'Food', 'Personality', 'Your Info', 'Your Trip']}
+        />
+      </View>
+      <ScrollView style={styles.scrollContent}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Enter your information</Text>
 
         <View style={styles.field}>
           <Text style={styles.label}>😊 Name</Text>
@@ -63,15 +71,24 @@ export default function Info() {
           />
         </View>
 
-        <TouchableOpacity
-          style={[styles.button, !isValid && styles.buttonDisabled]}
-          onPress={handleContinue}
-          disabled={!isValid}
-        >
-          <Text style={styles.buttonText}>Organize my trip</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+            >
+              <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, !isValid && styles.buttonDisabled]}
+              onPress={handleContinue}
+              disabled={!isValid}
+            >
+              <Text style={styles.buttonText}>Organize my trip ✨</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -80,15 +97,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
-    padding: 20,
-    paddingTop: 60,
+  header: {
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    backgroundColor: colors.background,
   },
-  step: {
-    fontSize: 14,
-    color: colors.accent,
-    fontWeight: '600',
-    marginBottom: 8,
+  scrollContent: {
+    flex: 1,
+  },
+  card: {
+    margin: 20,
+    marginTop: 0,
+    backgroundColor: colors.cardBg,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   title: {
     fontSize: 24,
@@ -115,17 +143,34 @@ const styles = StyleSheet.create({
     color: colors.text,
     backgroundColor: colors.white,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 20,
+  },
+  backButton: {
+    flex: 1,
+    backgroundColor: colors.border,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '600',
+  },
   button: {
+    flex: 2,
     backgroundColor: colors.accent,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 20,
   },
   buttonText: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   buttonDisabled: {
     opacity: 0.5,
