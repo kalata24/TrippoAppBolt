@@ -3,8 +3,10 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/components/colors';
-import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star } from 'lucide-react-native';
-import StepProgress from '@/components/StepProgress';
+import { ArrowLeft, Clock, MapPin, Footprints, Navigation, Star, ChevronDown, ChevronRight, Bookmark, BookmarkCheck } from 'lucide-react-native';
+import { useAuth } from '@/lib/auth-context';
+import Notification from '@/components/Notification';
+import SaveTripModal from '@/components/SaveTripModal';
 
 interface Activity {
   name: string;
@@ -28,6 +30,8 @@ interface TripData {
   staying_period: number;
   name: string;
   age: number;
+  title?: string;
+  is_saved: boolean;
   itinerary: {
     days: DayItinerary[];
     topAttractions: Array<{ name: string; day: string }>;
@@ -38,9 +42,13 @@ interface TripData {
 export default function TripDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const { user } = useAuth();
   const [trip, setTrip] = useState<TripData | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedDays, setExpandedDays] = useState<number[]>([1]);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadTrip();
@@ -52,7 +60,7 @@ export default function TripDetail() {
         .from('trips')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setTrip(data);
@@ -60,6 +68,33 @@ export default function TripDetail() {
       console.error('Error loading trip:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveTrip = async (customName?: string) => {
+    if (!trip || !user) return;
+
+    setSaving(true);
+    try {
+      const tripTitle = customName || `Trip to ${trip.destination}`;
+
+      const { error } = await supabase
+        .from('trips')
+        .update({
+          is_saved: true,
+          title: tripTitle,
+        })
+        .eq('id', trip.id);
+
+      if (error) throw error;
+
+      setTrip({ ...trip, is_saved: true, title: tripTitle });
+      setShowSaveModal(false);
+      setShowNotification(true);
+    } catch (error) {
+      console.error('Error saving trip:', error);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -102,20 +137,21 @@ export default function TripDetail() {
             <TouchableOpacity
               style={styles.dayHeader}
               onPress={() => toggleDay(day.day)}
+              activeOpacity={0.7}
             >
               <View style={styles.dayHeaderLeft}>
                 <Text style={styles.dayTitle}>Day {day.day}</Text>
-                <Text style={styles.tapHint}>Tap a card to expand</Text>
+                <Text style={styles.daySubtitlePreview}>{day.title}</Text>
               </View>
-              <Text style={styles.dayToggle}>
-                {expandedDays.includes(day.day) ? '▼' : '▶'}
-              </Text>
+              {expandedDays.includes(day.day) ? (
+                <ChevronDown size={24} color={colors.primary} />
+              ) : (
+                <ChevronRight size={24} color={colors.textLight} />
+              )}
             </TouchableOpacity>
 
             {expandedDays.includes(day.day) && (
               <View style={styles.dayContent}>
-                <Text style={styles.daySubtitle}>{day.title}</Text>
-
                 {day.activities.map((activity, index) => (
                   <View key={index} style={styles.activity}>
                     <View style={styles.activityIcon}>
@@ -125,7 +161,8 @@ export default function TripDetail() {
                   </View>
                 ))}
 
-                <View style={styles.statsRow}>
+                {(day.duration || day.distance || day.steps) && (
+                  <View style={styles.statsRow}>
                   {day.duration && (
                     <View style={styles.statBadge}>
                       <Clock size={14} color={colors.text} />
@@ -144,7 +181,8 @@ export default function TripDetail() {
                       <Text style={styles.statBadgeText}>{day.steps}</Text>
                     </View>
                   )}
-                </View>
+                  </View>
+                )}
 
                 <TouchableOpacity style={styles.directionsButton}>
                   <Navigation size={16} color={colors.white} />
@@ -185,12 +223,39 @@ export default function TripDetail() {
           </View>
         )}
 
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>✅ Trip Saved!</Text>
-        </TouchableOpacity>
+        {trip.is_saved ? (
+          <TouchableOpacity style={styles.savedButton} disabled>
+            <BookmarkCheck size={20} color={colors.textDark} />
+            <Text style={styles.savedButtonText}>Trip Saved</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={() => setShowSaveModal(true)}
+            disabled={saving}
+          >
+            <Bookmark size={20} color={colors.white} />
+            <Text style={styles.saveButtonText}>
+              {saving ? 'Saving...' : 'Save Trip'}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      <SaveTripModal
+        visible={showSaveModal}
+        defaultName={`Trip to ${trip.destination}`}
+        onClose={() => setShowSaveModal(false)}
+        onSave={handleSaveTrip}
+      />
+
+      <Notification
+        visible={showNotification}
+        message='Trip saved in "My Trips"'
+        onHide={() => setShowNotification(false)}
+      />
     </View>
   );
 }
@@ -272,35 +337,30 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: colors.textDark,
-    marginBottom: 2,
+    marginBottom: 4,
   },
-  tapHint: {
-    fontSize: 11,
+  daySubtitlePreview: {
+    fontSize: 13,
     color: colors.textLight,
-  },
-  dayToggle: {
-    fontSize: 14,
-    color: colors.text,
-    fontWeight: '700',
+    fontWeight: '500',
   },
   dayContent: {
     padding: 16,
   },
-  daySubtitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 16,
-  },
   activity: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 14,
+    marginBottom: 12,
     backgroundColor: colors.white,
-    padding: 12,
-    borderRadius: 12,
-    borderLeftWidth: 3,
+    padding: 14,
+    borderRadius: 10,
+    borderLeftWidth: 4,
     borderLeftColor: colors.accent,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   activityIcon: {
     width: 32,
@@ -461,19 +521,38 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   saveButton: {
-    backgroundColor: colors.accentYellow,
+    backgroundColor: colors.accent,
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
-    shadowColor: colors.accentYellow,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    shadowColor: colors.accent,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 5,
   },
   saveButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  savedButton: {
+    backgroundColor: colors.surfaceLight,
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 2,
+    borderColor: colors.border,
+  },
+  savedButtonText: {
     color: colors.textDark,
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '700',
   },
 });
