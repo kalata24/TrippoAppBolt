@@ -58,25 +58,40 @@ CRITICAL REQUIREMENTS:
    - If "Concert Lover": Check for concerts, music festivals, live performances happening during ${travelMonth} ${travelYear} in ${destination}
    - If "Sports Fan": Check for sports events, matches, tournaments happening during ${travelMonth} ${travelYear} in ${destination}
    - If "Local Culture": Include traditional markets, cultural centers, local neighborhoods, and check for local festivals, events during ${travelMonth} ${travelYear}
-4. EVENTS AND ENTERTAINMENT:
+4. SEASONAL ATTRACTIONS (CRITICAL - DO NOT SKIP):
+   - ALWAYS check the travel month (${travelMonth}) and include seasonal attractions that are GUARANTEED to be happening:
+
+   WINTER (November-December) - MUST INCLUDE if destination is in Europe:
+     * Christmas Markets / Weihnachtsmarkt / Christkindlmarkt (Vienna, Germany, Austria, Switzerland, etc.)
+     * Include SPECIFIC market names: "Rathausplatz Christmas Market", "Stephansplatz Christmas Market", etc.
+     * Mention glühwein (mulled wine), traditional foods, Christmas shopping
+
+   AUTUMN (September-October):
+     * Oktoberfest in Munich (mid-September to early October)
+     * Fall foliage viewing in parks and nature areas
+
+   SUMMER (June-August):
+     * Outdoor concerts in parks
+     * Beach activities if coastal destination
+     * Outdoor festivals and street fairs
+
+   SPRING (March-May):
+     * Cherry blossoms / Spring flowers in gardens
+     * Easter markets (March-April)
+
+5. SPECIFIC EVENTS (concerts, sports):
    - ONLY suggest specific events (concerts, sports matches) if you are CERTAIN they are happening on those exact dates
-   - If you don't have confirmed information about specific events on ${start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} to ${end.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}, suggest GENERAL activities instead:
+   - If you don't have confirmed information, suggest GENERAL activities instead:
      * Instead of "Liverpool vs Everton match": suggest "Check for Premier League matches at Anfield Stadium (verify schedule)"
      * Instead of specific concert: suggest "Explore live music venues like [Venue Name]"
-     * Instead of specific festival: suggest "Visit [venue] to see if there are any events during your stay"
-   - For seasonal/recurring events you CAN mention if dates align:
-     * Broadway shows (always running)
-     * Christmas Markets (November-December)
-     * Oktoberfest (mid-September to early October)
-     * Major annual festivals if dates match
    - NEVER invent specific event matchups or concert dates
-   - Use phrases like "Check for", "Look for", "Explore" when suggesting event venues without confirmed schedules
-5. For restaurants, match the food types selected:
+
+6. For restaurants, match the food types selected:
    - Use real restaurant names that serve that cuisine type in ${destination}
    - Example: If "Pizza" selected and destination is London, include "Franco Manca" or "Pizza Pilgrims"
-6. Format activities like: "Visit [Specific Place Name] - [brief description] - [duration in minutes]"
-7. Make durations realistic (7-12 hours per day)
-8. Calculate realistic walking distances and steps
+7. Format activities like: "Visit [Specific Place Name] - [brief description] - [duration in minutes]"
+8. Make durations realistic (7-12 hours per day)
+9. Calculate realistic walking distances and steps
 
 Example format for activities:
 - "Buckingham Palace (Changing of the Guard) - 60 minutes"
