@@ -66,18 +66,18 @@ export default function Personality() {
                 <Text style={styles.traitName}>{trait.name}</Text>
               </TouchableOpacity>
             ))}
-            <TouchableOpacity
-              style={[
-                styles.traitCard,
-                styles.localCultureCard,
-                isLocalCultureSelected && styles.localCultureCardSelected
-              ]}
-              onPress={() => toggle('Local Culture')}
-            >
-              <Text style={styles.traitEmoji}>❤️</Text>
-              <Text style={styles.traitName}>Local Culture</Text>
-            </TouchableOpacity>
           </View>
+
+          <TouchableOpacity
+            style={[
+              styles.localCultureCard,
+              isLocalCultureSelected && styles.localCultureCardSelected
+            ]}
+            onPress={() => toggle('Local Culture')}
+          >
+            <Text style={styles.localCultureEmoji}>🌍</Text>
+            <Text style={styles.localCultureName}>Local Culture</Text>
+          </TouchableOpacity>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
@@ -173,12 +173,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   localCultureCard: {
+    width: '100%',
     backgroundColor: colors.pink,
     borderColor: colors.pink,
+    borderRadius: 20,
+    paddingVertical: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
   },
   localCultureCardSelected: {
     borderColor: colors.accent,
     backgroundColor: colors.accent + '20',
+  },
+  localCultureEmoji: {
+    fontSize: 60,
+    marginBottom: 8,
+  },
+  localCultureName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
   },
   buttonRow: {
     flexDirection: 'row',

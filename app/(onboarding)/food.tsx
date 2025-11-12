@@ -69,18 +69,18 @@ export default function Food() {
                 <Text style={styles.foodName}>{food.name}</Text>
               </TouchableOpacity>
             ))}
-            <TouchableOpacity
-              style={[
-                styles.foodCard,
-                styles.localFoodCard,
-                isLocalFoodSelected && styles.localFoodCardSelected
-              ]}
-              onPress={() => toggle('Local Food')}
-            >
-              <Text style={styles.foodEmoji}>🌍</Text>
-              <Text style={styles.foodName}>Local Food</Text>
-            </TouchableOpacity>
           </View>
+
+          <TouchableOpacity
+            style={[
+              styles.localFoodCard,
+              isLocalFoodSelected && styles.localFoodCardSelected
+            ]}
+            onPress={() => toggle('Local Food')}
+          >
+            <Text style={styles.localFoodEmoji}>🌍</Text>
+            <Text style={styles.localFoodName}>Local Food</Text>
+          </TouchableOpacity>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
@@ -176,12 +176,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   localFoodCard: {
+    width: '100%',
     backgroundColor: colors.accentYellow,
     borderColor: colors.accentYellow,
+    borderRadius: 20,
+    paddingVertical: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
   },
   localFoodCardSelected: {
     borderColor: colors.accent,
     backgroundColor: colors.accent + '20',
+  },
+  localFoodEmoji: {
+    fontSize: 60,
+    marginBottom: 8,
+  },
+  localFoodName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
   },
   buttonRow: {
     flexDirection: 'row',
