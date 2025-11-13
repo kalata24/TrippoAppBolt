@@ -8,34 +8,54 @@ Make sure you have:
 
 ## Build Commands
 
-### Option 1: Using Expo CLI (Recommended)
+**IMPORTANT:** When you run the Gradle build, it automatically:
+1. Bundles all your JavaScript code using Metro bundler
+2. Includes all assets and images
+3. Embeds environment variables from app.config.js
+4. Creates a standalone APK with everything needed
+
+### Option 1: Using npm scripts (Easiest)
 ```bash
-# Install dependencies
+# Install dependencies first
 npm install
 
-# Build APK
-npx expo run:android --variant release
+# Build release APK (optimized, smaller size)
+npm run build:apk
+
+# OR build debug APK (includes logging, easier to debug)
+npm run build:apk:debug
 ```
 
 ### Option 2: Using Gradle Directly
 ```bash
-# Clean previous build
-cd android
-./gradlew clean
+# First ensure dependencies are installed
+npm install
 
-# Build release APK
+# Then build release APK
+cd android
 ./gradlew assembleRelease
 
-# APK will be at: android/app/build/outputs/apk/release/app-release.apk
-```
-
-### Option 3: Build debug APK (better error messages)
-```bash
-cd android
+# OR build debug APK
 ./gradlew assembleDebug
-
-# APK will be at: android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+### Option 3: Using Expo CLI
+```bash
+# This handles everything automatically
+npx expo run:android --variant release
+```
+
+## APK Locations
+- **Release APK:** `android/app/build/outputs/apk/release/app-release.apk`
+- **Debug APK:** `android/app/build/outputs/apk/debug/app-debug.apk`
+
+## What's Included in the APK?
+✅ All JavaScript code (~6 MB bundled)
+✅ All assets and images
+✅ Supabase configuration from app.config.js
+✅ Native Android libraries
+✅ React Native runtime
+✅ Total APK size: ~25-35 MB (typical for React Native apps)
 
 ## What Was Fixed
 
