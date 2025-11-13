@@ -96,10 +96,6 @@ android {
         versionName "1.0"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
-
-        // Supabase environment variables
-        resValue "string", "EXPO_PUBLIC_SUPABASE_URL", "https://haiiwytkyojxspaslqqa.supabase.co"
-        resValue "string", "EXPO_PUBLIC_SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhhaWl3eXRreW9qeHNwYXNscXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzM4MDEsImV4cCI6MjA3ODUwOTgwMX0.0vcUTeWAzQD5Nd0OVKQvLRw35ILLsmZcy4kaxgMJGk0"
     }
     buildFeatures {
         buildConfig = true
