@@ -89,7 +89,7 @@ android {
 
     namespace "com.trippo.app"
     defaultConfig {
-        applicationId "com.trippo"
+        applicationId "com.trippo.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
