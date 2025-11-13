@@ -7,20 +7,22 @@
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "image": "latest"
+        "image": "ubuntu-24.04-jdk-22-ndk-r27c",
+        "gradleCommand": ":app:assembleDebug"
       }
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "image": "latest"
+        "image": "ubuntu-24.04-jdk-22-ndk-r27c",
+        "gradleCommand": ":app:assembleRelease"
       }
     },
     "production": {
       "android": {
         "buildType": "app-bundle",
-        "image": "latest"
+        "image": "ubuntu-24.04-jdk-22-ndk-r27c"
       }
     }
   },
