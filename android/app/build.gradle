@@ -87,18 +87,15 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.trippo.app"
+    namespace "com.trippo"
     defaultConfig {
-        applicationId "com.trippo.app"
+        applicationId "com.trippo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
-    }
-    buildFeatures {
-        buildConfig = true
     }
     signingConfigs {
         debug {
