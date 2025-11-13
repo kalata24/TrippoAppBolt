@@ -12,4 +12,13 @@ const supabaseAnonKey =
   Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
   '';
 
+console.log('Supabase Config:', {
+  url: supabaseUrl ? 'Found' : 'Missing',
+  key: supabaseAnonKey ? 'Found' : 'Missing',
+});
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase configuration is missing. Check your environment variables.');
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
