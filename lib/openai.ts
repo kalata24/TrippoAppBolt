@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import Constants from 'expo-constants';
 
 export async function generateTripPlan(
   destination: string,
@@ -18,7 +19,12 @@ export async function generateTripPlan(
       throw new Error('User not authenticated');
     }
 
-    const apiUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/generate-trip`;
+    const supabaseUrl =
+      process.env.EXPO_PUBLIC_SUPABASE_URL ||
+      Constants.expoConfig?.extra?.EXPO_PUBLIC_SUPABASE_URL ||
+      '';
+
+    const apiUrl = `${supabaseUrl}/functions/v1/generate-trip`;
 
     const response = await fetch(apiUrl, {
       method: 'POST',
