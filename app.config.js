@@ -4,7 +4,6 @@ module.exports = {
     slug: "trippo",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
     scheme: "trippo",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -13,10 +12,6 @@ module.exports = {
       bundleIdentifier: "com.trippo.app"
     },
     android: {
-      adaptiveIcon: {
-        foregroundImage: "./assets/images/icon.png",
-        backgroundColor: "#7DD3C0"
-      },
       package: "com.trippo.app"
     },
     web: {
