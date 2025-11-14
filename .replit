@@ -1,0 +1,13 @@
+run = "npm run dev -- --web --port 5000"
+entrypoint = "app/index.tsx"
+
+[nix]
+channel = "stable-23_11"
+
+[deployment]
+run = ["sh", "-c", "npm run dev -- --web --port 5000"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

@@ -26,9 +26,11 @@ module.exports = {
       output: "single",
       favicon: "./assets/images/favicon.png"
     },
+    assetBundlePatterns: ["**/*"],
     plugins: [],
     experiments: {
-      typedRoutes: true
+      typedRoutes: true,
+      baseUrl: "/"
     },
     extra: {
       eas: {
