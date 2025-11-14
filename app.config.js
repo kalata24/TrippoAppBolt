@@ -7,7 +7,7 @@ module.exports = {
     icon: "./assets/images/icon.png",
     scheme: "trippo",
     userInterfaceStyle: "automatic",
-    newArchEnabled: true,
+    runtimeVersion: "1.0.0",
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.trippo.app"
@@ -18,6 +18,7 @@ module.exports = {
         backgroundColor: "#7DD3C0"
       },
       package: "com.trippo.app",
+      versionCode: 1,
       permissions: []
     },
     web: {
