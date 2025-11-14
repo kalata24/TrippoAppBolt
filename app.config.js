@@ -1,7 +1,7 @@
 module.exports = {
   expo: {
     name: "Trippo",
-    slug: "trippo",
+    slug: "trippoapp",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
@@ -32,7 +32,7 @@ module.exports = {
     },
     extra: {
       eas: {
-        projectId: "d47540bf-3733-4ae2-a902-d787869ee8b0"
+        projectId: "b4059dce-2052-4a6c-9ece-57c4bacae6dd"
       },
       EXPO_PUBLIC_SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL || "https://haiiwytkyojxspaslqqa.supabase.co",
       EXPO_PUBLIC_SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhhaWl3eXRreW9qeHNwYXNscXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzM4MDEsImV4cCI6MjA3ODUwOTgwMX0.0vcUTeWAzQD5Nd0OVKQvLRw35ILLsmZcy4kaxgMJGk0"
